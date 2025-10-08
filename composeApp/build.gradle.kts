@@ -50,6 +50,8 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             api("io.github.kevinnzou:compose-webview-multiplatform:2.0.3")
+            implementation("dev.datlag:kcef:2025.03.23")
+
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -57,6 +59,19 @@ kotlin {
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
+        }
+
+        afterEvaluate {
+            tasks.withType<JavaExec> {
+                jvmArgs("--add-opens", "java.desktop/sun.awt=ALL-UNNAMED")
+                jvmArgs("--add-opens", "java.desktop/java.awt.peer=ALL-UNNAMED")
+
+                if (System.getProperty("os.name").contains("Mac")) {
+                    jvmArgs("--add-opens", "java.desktop/sun.awt=ALL-UNNAMED")
+                    jvmArgs("--add-opens", "java.desktop/sun.lwawt=ALL-UNNAMED")
+                    jvmArgs("--add-opens", "java.desktop/sun.lwawt.macosx=ALL-UNNAMED")
+                }
+            }
         }
     }
 }
