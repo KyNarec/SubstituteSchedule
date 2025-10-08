@@ -9,6 +9,13 @@ plugins {
     alias(libs.plugins.composeHotReload)
 }
 
+repositories {
+    mavenCentral()
+    google()
+    // Needed for compose-webview-multiplatform: https://github.com/kevinnzou/compose-webview-multiplatform
+    maven("https://jogamp.org/deployment/maven")
+}
+
 kotlin {
     androidTarget {
         compilerOptions {
@@ -42,6 +49,7 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+            api("io.github.kevinnzou:compose-webview-multiplatform:2.0.3")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
