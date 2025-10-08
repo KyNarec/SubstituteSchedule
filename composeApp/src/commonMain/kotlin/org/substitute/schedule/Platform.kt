@@ -1,0 +1,7 @@
+package org.substitute.schedule
+
+interface Platform {
+    val name: String
+}
+
+expect fun getPlatform(): Platform
