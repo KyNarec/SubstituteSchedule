@@ -1,14 +1,14 @@
 package org.substitute.schedule
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -18,17 +18,34 @@ import androidx.compose.ui.Modifier
 import com.multiplatform.webview.web.LoadingState
 import com.multiplatform.webview.web.WebView
 import com.multiplatform.webview.web.rememberWebViewState
-import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
-
-import substituteschedule.composeapp.generated.resources.Res
-import substituteschedule.composeapp.generated.resources.compose_multiplatform
+import kotlinx.coroutines.launch
+import org.substitute.schedule.networking.DsbApiClient
+import org.substitute.schedule.networking.TimeTable
+import org.substitute.schedule.utils.enums.SelectedDay
 
 @Composable
-@Preview
-fun App() {
+fun App(
+    client: DsbApiClient
+) {
     MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
+        var selectedDay by remember { mutableStateOf(SelectedDay.TODAY) }
+        var distinctTables by remember { mutableStateOf<List<TimeTable>>(emptyList()) }
+        var isLoading by remember { mutableStateOf(true) }
+        var errorMessage by remember { mutableStateOf<String?>(null) }
+
+        // Launch the coroutine only once when the composable is first created
+        LaunchedEffect(Unit) {
+            try {
+                val tables = client.getTimeTables()
+                distinctTables = tables.distinctBy { it.uuid }
+                println("Distinct Tables: $distinctTables")
+                isLoading = false
+            } catch (e: Exception) {
+                errorMessage = "Error loading timetables: ${e.message}"
+                isLoading = false
+            }
+        }
+
         Column(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.primaryContainer)
@@ -36,35 +53,75 @@ fun App() {
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Button(onClick = { showContent = !showContent }) {
-                Text("Click me!")
+            Row {
+                Button(onClick = { selectedDay = SelectedDay.TODAY }) {
+                    Text("Today")
+                }
+                Button(onClick = { selectedDay = SelectedDay.TOMORROW }) {
+                    Text("Tomorrow")
+                }
             }
-//            AnimatedVisibility(showContent) {
-//                val greeting = remember { Greeting().greet() }
-//                Column(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    horizontalAlignment = Alignment.CenterHorizontally,
-//                ) {
-//                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-//                    Text("Compose: $greeting")
-//                }
-//            }
-            val state = rememberWebViewState("https://dsbmobile.de/data/80e390a5-535f-446b-b8fc-dd1d71b99aca/c29fc270-febe-4228-9b8a-beedcb3c9c59/c29fc270-febe-4228-9b8a-beedcb3c9c59.htm")
 
             Box(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
             ) {
-                val loadingState = state.loadingState
-                if (loadingState is LoadingState.Loading) {
-                    LinearProgressIndicator(
-                        progress = { loadingState.progress },
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                when {
+                    // Show loading indicator
+                    isLoading -> {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            CircularProgressIndicator()
+                            Text("Loading timetables...")
+                        }
+                    }
+
+                    // Show error message
+                    errorMessage != null -> {
+                        Text(
+                            text = errorMessage!!,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+
+                    // Show "no data" message
+                    distinctTables.isEmpty() -> {
+                        Text("No timetables available")
+                    }
+
+                    // Show WebView with data
+                    else -> {
+                        val selectedIndex = when (selectedDay) {
+                            SelectedDay.TODAY -> 0
+                            SelectedDay.TOMORROW -> 1
+                        }
+
+                        // Make sure we don't go out of bounds
+                        if (selectedIndex < distinctTables.size) {
+                            val url = distinctTables[selectedIndex].detail
+
+                            // Use key() to force recreation when selectedDay changes
+                            key(selectedDay) {
+                                val state = rememberWebViewState(url)
+                                val loadingState = state.loadingState
+
+                                Column(modifier = Modifier.fillMaxSize()) {
+                                    if (loadingState is LoadingState.Loading) {
+                                        LinearProgressIndicator(
+                                            progress = { loadingState.progress },
+                                            modifier = Modifier.fillMaxWidth()
+                                        )
+                                    }
+                                    WebView(
+                                        state = state,
+                                        modifier = Modifier.fillMaxSize()
+                                    )
+                                }
+                            }
+                        } else {
+                            Text("Selected day not available")
+                        }
+                    }
                 }
-                WebView(
-                    state = state,
-                    modifier = Modifier.fillMaxSize()
-                )
             }
         }
     }

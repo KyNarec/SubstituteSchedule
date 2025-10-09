@@ -14,8 +14,11 @@ import androidx.compose.ui.window.application
 import com.multiplatform.webview.util.addTempDirectoryRemovalHook
 import dev.datlag.kcef.KCEF
 import dev.datlag.kcef.KCEFBuilder
+import io.ktor.client.engine.okhttp.OkHttp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.substitute.schedule.networking.DsbApiClient
+import org.substitute.schedule.networking.createHttpClient
 import java.io.File
 import kotlin.math.max
 
@@ -61,7 +64,9 @@ fun main() = application {
             Text(text = "Restart required.")
         } else {
             if (initialized) {
-                App()
+                App(
+                    client = DsbApiClient(createHttpClient(OkHttp.create()))
+                )
             } else {
                 Text(text = "Downloading $downloading%")
             }

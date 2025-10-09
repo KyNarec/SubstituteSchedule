@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.composeHotReload)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 repositories {
@@ -39,6 +40,8 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.ktor.client.okhttp)
+
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -51,6 +54,17 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
             api("io.github.kevinnzou:compose-webview-multiplatform:2.0.3")
             implementation("dev.datlag:kcef:2025.03.23")
+            implementation(libs.bundles.ktor)
+            implementation("org.slf4j:slf4j-api:2.0.17")
+            implementation("com.squareup.okio:okio:3.16.0")
+            // JSON serialization (replaces Gson)
+            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+
+            // Date/Time (replaces SimpleDateFormat/Date)
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
+
+            // UUID (replaces java.util.UUID)
+            implementation("com.benasher44:uuid:0.8.2")
 
         }
         commonTest.dependencies {
@@ -59,6 +73,12 @@ kotlin {
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
+            implementation(libs.ktor.client.okhttp)
+        }
+
+        nativeMain.dependencies {
+            implementation(libs.ktor.client.darwin)
+
         }
 
         afterEvaluate {
