@@ -4,9 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LinearProgressIndicator
@@ -15,19 +17,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.multiplatform.webview.web.LoadingState
 import com.multiplatform.webview.web.WebView
 import com.multiplatform.webview.web.rememberWebViewState
 import kotlinx.coroutines.launch
 import org.substitute.schedule.networking.DsbApiClient
 import org.substitute.schedule.networking.TimeTable
+import org.substitute.schedule.ui.theme.AppTheme
 import org.substitute.schedule.utils.enums.SelectedDay
 
 @Composable
 fun App(
     client: DsbApiClient
 ) {
-    MaterialTheme {
+    AppTheme() {
         var selectedDay by remember { mutableStateOf(SelectedDay.TODAY) }
         var distinctTables by remember { mutableStateOf<List<TimeTable>>(emptyList()) }
         var isLoading by remember { mutableStateOf(true) }
@@ -57,6 +61,7 @@ fun App(
                 Button(onClick = { selectedDay = SelectedDay.TODAY }) {
                     Text("Today")
                 }
+                Spacer(modifier = Modifier.width(16.dp))
                 Button(onClick = { selectedDay = SelectedDay.TOMORROW }) {
                     Text("Tomorrow")
                 }
