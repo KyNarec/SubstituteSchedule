@@ -3,6 +3,7 @@ package org.substitute.schedule
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,6 +24,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -45,7 +48,6 @@ fun App(
         var selectedScreen by remember { mutableStateOf(SelectedScreen.TODAY) }
         var distinctTables by remember { mutableStateOf<List<TimeTable>>(emptyList()) }
         var isLoading by remember { mutableStateOf(true) }
-        var errorMessage by remember { mutableStateOf<String?>(null) }
 
         LaunchedEffect(Unit) {
             try {
@@ -54,7 +56,7 @@ fun App(
                 println("Distinct Tables: $distinctTables")
                 isLoading = false
             } catch (e: Exception) {
-                errorMessage = "Error loading timetables: ${e.message}"
+                println("Error loading timetables: ${e.message}")
                 isLoading = false
             }
         }
@@ -62,40 +64,23 @@ fun App(
         // Show loading state until data is ready
         if (isLoading) {
             Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
+                contentAlignment = Alignment.Center,
+
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     CircularProgressIndicator()
-                    Text("Loading timetables...")
+                    Text("Loading timetables...", color = MaterialTheme.colorScheme.onBackground)
                 }
             }
             return@AppTheme
         }
 
-        // Show error state
-        if (errorMessage != null) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = errorMessage!!,
-                    color = MaterialTheme.colorScheme.error
-                )
-            }
-            return@AppTheme
-        }
 
-        // Show empty state
-        if (distinctTables.isEmpty()) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("No timetables available")
-            }
-            return@AppTheme
+        val startDestination = if (distinctTables.isNotEmpty()) {
+            Destination.Today(distinctTables[0].detail)
+        } else {
+            Destination.Settings(true)
         }
 
         val navController = rememberNavController()
@@ -106,8 +91,10 @@ fun App(
                     NavigationBarItem(
                         selected = selectedScreen == SelectedScreen.TODAY,
                         onClick = {
-                            navController.navigate(Destination.Today(distinctTables[0].detail))
-                            selectedScreen = SelectedScreen.TODAY
+                            if (distinctTables.size > 1 && startDestination != Destination.Settings) {
+                                navController.navigate(Destination.Today(distinctTables[0].detail))
+                                selectedScreen = SelectedScreen.TODAY
+                            }
                         },
                         icon = {
                             Icon(
@@ -120,7 +107,7 @@ fun App(
                     NavigationBarItem(
                         selected = selectedScreen == SelectedScreen.TOMORROW,
                         onClick = {
-                            if (distinctTables.size > 1) {
+                            if (distinctTables.size > 1 && startDestination != Destination.Settings) {
                                 navController.navigate(Destination.Tomorrow(distinctTables[1].detail))
                                 selectedScreen = SelectedScreen.TOMORROW
                             }
@@ -136,7 +123,7 @@ fun App(
                     NavigationBarItem(
                         selected = selectedScreen == SelectedScreen.SETTINGS,
                         onClick = {
-                            navController.navigate(Destination.Settings(url = ""))
+                            navController.navigate(Destination.Settings(false))
                             selectedScreen = SelectedScreen.SETTINGS
                         },
                         icon = {
@@ -152,7 +139,7 @@ fun App(
 
             NavHost(
                 navController,
-                startDestination = Destination.Today(distinctTables[0].detail)
+                startDestination = startDestination
             ) {
 
                 composable<Destination.Today> {
@@ -175,11 +162,19 @@ fun App(
                     val args = it.toRoute<Destination.Settings>()
 
                     box()
+
+
+
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("Settings screen")
+                        if (args.noCredentials) {
+                            Text("No credentials found", color = MaterialTheme.colorScheme.error, fontSize = 20.sp)
+                            Spacer(Modifier.height(16.dp))
+                        } else {
+                            Text("Settings screen")
+                        }
                     }
                 }
             }
