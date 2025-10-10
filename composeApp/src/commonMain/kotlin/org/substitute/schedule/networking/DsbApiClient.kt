@@ -36,8 +36,8 @@ class DsbApiClient(
     private val args = mutableMapOf<String, Any?>()
 
     init {
-        args["UserId"] = "255561"
-        args["UserPw"] = "plan"
+        args["UserId"] = "XX"
+        args["UserPw"] = "XX"
         args["Language"] = "de"
 
         args["Device"] = "Nexus 4"

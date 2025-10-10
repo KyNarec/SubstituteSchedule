@@ -24,8 +24,10 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Preview
+@Preview(showSystemUi = true, showBackground = false)
 @Composable
 fun AppAndroidPreview() {
-    App()
+    App(
+        client = DsbApiClient(createHttpClient(OkHttp.create()))
+    )
 }

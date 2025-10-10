@@ -58,13 +58,18 @@ kotlin {
             implementation("org.slf4j:slf4j-api:2.0.17")
             implementation("com.squareup.okio:okio:3.16.0")
             // JSON serialization (replaces Gson)
-            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
 
             // Date/Time (replaces SimpleDateFormat/Date)
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
 
             // UUID (replaces java.util.UUID)
             implementation("com.benasher44:uuid:0.8.2")
+
+            implementation(libs.navigation.compose)
+//            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
+            implementation("org.jetbrains.compose.material:material-icons-extended:1.7.3")
+
 
         }
         commonTest.dependencies {

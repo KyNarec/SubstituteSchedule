@@ -1,6 +1,7 @@
 package org.substitute.schedule.utils.enums
 
-enum class SelectedDay {
+enum class SelectedScreen {
     TODAY,
     TOMORROW,
+    SETTINGS
 }

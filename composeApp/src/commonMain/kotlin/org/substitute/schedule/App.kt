@@ -3,41 +3,50 @@ package org.substitute.schedule
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.safeContentPadding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Today
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.multiplatform.webview.web.LoadingState
 import com.multiplatform.webview.web.WebView
 import com.multiplatform.webview.web.rememberWebViewState
-import kotlinx.coroutines.launch
 import org.substitute.schedule.networking.DsbApiClient
 import org.substitute.schedule.networking.TimeTable
+import org.substitute.schedule.ui.screens.WebViewScreen
 import org.substitute.schedule.ui.theme.AppTheme
-import org.substitute.schedule.utils.enums.SelectedDay
+import org.substitute.schedule.utils.Destination
+import org.substitute.schedule.utils.enums.SelectedScreen
 
 @Composable
 fun App(
     client: DsbApiClient
 ) {
     AppTheme() {
-        var selectedDay by remember { mutableStateOf(SelectedDay.TODAY) }
+        var selectedScreen by remember { mutableStateOf(SelectedScreen.TODAY) }
         var distinctTables by remember { mutableStateOf<List<TimeTable>>(emptyList()) }
         var isLoading by remember { mutableStateOf(true) }
         var errorMessage by remember { mutableStateOf<String?>(null) }
 
-        // Launch the coroutine only once when the composable is first created
         LaunchedEffect(Unit) {
             try {
                 val tables = client.getTimeTables()
@@ -50,84 +59,136 @@ fun App(
             }
         }
 
-        Column(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .safeContentPadding()
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Row {
-                Button(onClick = { selectedDay = SelectedDay.TODAY }) {
-                    Text("Today")
-                }
-                Spacer(modifier = Modifier.width(16.dp))
-                Button(onClick = { selectedDay = SelectedDay.TOMORROW }) {
-                    Text("Tomorrow")
-                }
-            }
-
+        // Show loading state until data is ready
+        if (isLoading) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                when {
-                    // Show loading indicator
-                    isLoading -> {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            CircularProgressIndicator()
-                            Text("Loading timetables...")
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    CircularProgressIndicator()
+                    Text("Loading timetables...")
+                }
+            }
+            return@AppTheme
+        }
+
+        // Show error state
+        if (errorMessage != null) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = errorMessage!!,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+            return@AppTheme
+        }
+
+        // Show empty state
+        if (distinctTables.isEmpty()) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("No timetables available")
+            }
+            return@AppTheme
+        }
+
+        val navController = rememberNavController()
+
+        Scaffold(
+            bottomBar = {
+                NavigationBar {
+                    NavigationBarItem(
+                        selected = selectedScreen == SelectedScreen.TODAY,
+                        onClick = {
+                            navController.navigate(Destination.Today(distinctTables[0].detail))
+                            selectedScreen = SelectedScreen.TODAY
+                        },
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.Home,
+                                contentDescription = "Today",
+                            )
                         }
-                    }
+                    )
 
-                    // Show error message
-                    errorMessage != null -> {
-                        Text(
-                            text = errorMessage!!,
-                            color = MaterialTheme.colorScheme.error
-                        )
-                    }
-
-                    // Show "no data" message
-                    distinctTables.isEmpty() -> {
-                        Text("No timetables available")
-                    }
-
-                    // Show WebView with data
-                    else -> {
-                        val selectedIndex = when (selectedDay) {
-                            SelectedDay.TODAY -> 0
-                            SelectedDay.TOMORROW -> 1
-                        }
-
-                        // Make sure we don't go out of bounds
-                        if (selectedIndex < distinctTables.size) {
-                            val url = distinctTables[selectedIndex].detail
-
-                            // Use key() to force recreation when selectedDay changes
-                            key(selectedDay) {
-                                val state = rememberWebViewState(url)
-                                val loadingState = state.loadingState
-
-                                Column(modifier = Modifier.fillMaxSize()) {
-                                    if (loadingState is LoadingState.Loading) {
-                                        LinearProgressIndicator(
-                                            progress = { loadingState.progress },
-                                            modifier = Modifier.fillMaxWidth()
-                                        )
-                                    }
-                                    WebView(
-                                        state = state,
-                                        modifier = Modifier.fillMaxSize()
-                                    )
-                                }
+                    NavigationBarItem(
+                        selected = selectedScreen == SelectedScreen.TOMORROW,
+                        onClick = {
+                            if (distinctTables.size > 1) {
+                                navController.navigate(Destination.Tomorrow(distinctTables[1].detail))
+                                selectedScreen = SelectedScreen.TOMORROW
                             }
-                        } else {
-                            Text("Selected day not available")
+                        },
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.Today,
+                                contentDescription = "Tomorrow",
+                            )
                         }
+                    )
+
+                    NavigationBarItem(
+                        selected = selectedScreen == SelectedScreen.SETTINGS,
+                        onClick = {
+                            navController.navigate(Destination.Settings(url = ""))
+                            selectedScreen = SelectedScreen.SETTINGS
+                        },
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.Settings,
+                                contentDescription = "Settings",
+                            )
+                        }
+                    )
+                }
+            },
+        ) { contentPadding ->
+
+            NavHost(
+                navController,
+                startDestination = Destination.Today(distinctTables[0].detail)
+            ) {
+
+                composable<Destination.Today> {
+                    selectedScreen = SelectedScreen.TODAY
+
+                    val args = it.toRoute<Destination.Today>()
+                    WebViewScreen(args.url)
+                }
+
+                composable<Destination.Tomorrow> {
+                    selectedScreen = SelectedScreen.TOMORROW
+
+                    val args = it.toRoute<Destination.Tomorrow>()
+                    WebViewScreen(args.url)
+
+                }
+                composable<Destination.Settings> {
+                    selectedScreen = SelectedScreen.SETTINGS
+
+                    val args = it.toRoute<Destination.Settings>()
+
+                    box()
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Settings screen")
                     }
                 }
             }
         }
     }
+}
+
+@Composable
+fun box() {
+    Box(modifier = Modifier.height(32.dp)
+        .background(MaterialTheme.colorScheme.background))
 }
