@@ -20,6 +20,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -57,7 +59,8 @@ fun App(
         var distinctTables by remember { mutableStateOf<List<TimeTable>>(emptyList()) }
         var isLoading by remember { mutableStateOf(true) }
         var loadAttemptFailed by remember { mutableStateOf(false) }
-
+        val snackbarHostState = remember { SnackbarHostState() }
+        val scope = rememberCoroutineScope()
 
         LaunchedEffect(Unit) {
             client.username = storage.getString(USERNAME).toString()
@@ -82,6 +85,9 @@ fun App(
         val navController = rememberNavController()
 
         Scaffold(
+            snackbarHost = {
+                SnackbarHost(hostState = snackbarHostState)
+            },
             bottomBar = {
                 NavigationBar {
                     NavigationBarItem(
@@ -191,7 +197,7 @@ fun App(
 //                            Text("Settings screen")
 //                        }
 //                    }
-                    SettingsScreen(storage)
+                    SettingsScreen(storage, snackbarHostState, args.noCredentials)
                 }
             }
         }

@@ -15,6 +15,8 @@ import org.substitute.schedule.utils.SecureStorage
 @Composable
 fun SettingsScreen(
     secureStorage: SecureStorage,
+    snackbarHostState: SnackbarHostState,
+    noCredentials: Boolean,
     modifier: Modifier = Modifier
 ) {
     val scope = rememberCoroutineScope()
@@ -51,6 +53,15 @@ fun SettingsScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            if (noCredentials) {
+                Text(
+                    "No credentials found",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.headlineMedium,
+                    modifier = Modifier.padding(bottom = 32.dp)
+
+                )
+            }
             Text(
                 "Settings",
                 style = MaterialTheme.typography.headlineMedium,
@@ -87,6 +98,7 @@ fun SettingsScreen(
                             secureStorage.putString(USERNAME, username)
                             secureStorage.putString(PASSWORD, password)
                             message = "Credentials saved"
+                            snackbarHostState.showSnackbar("To apply changes, please restart the app")
                         }
                     },
                     modifier = Modifier.weight(1f)
@@ -102,6 +114,7 @@ fun SettingsScreen(
                             username = ""
                             password = ""
                             message = "Credentials cleared"
+                            snackbarHostState.showSnackbar("To apply changes, please restart the app")
                         }
                     },
                     modifier = Modifier.weight(1f)
