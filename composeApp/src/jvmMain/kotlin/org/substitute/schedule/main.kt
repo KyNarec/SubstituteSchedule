@@ -19,6 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.substitute.schedule.networking.DsbApiClient
 import org.substitute.schedule.networking.createHttpClient
+import org.substitute.schedule.utils.DesktopSecureStorage
 import java.io.File
 import kotlin.math.max
 
@@ -65,7 +66,10 @@ fun main() = application {
         } else {
             if (initialized) {
                 App(
-                    client = DsbApiClient(createHttpClient(OkHttp.create()))
+                    client = DsbApiClient(createHttpClient(OkHttp.create())),
+                    storage = remember {
+                        DesktopSecureStorage()
+                    }
                 )
             } else {
                 Text(text = "Downloading $downloading%")

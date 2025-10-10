@@ -11,4 +11,7 @@ sealed interface Destination {
 
     @Serializable
     data class Settings(val noCredentials: Boolean) : Destination
+
+    @Serializable
+    object InitialLoadingRoute
 }

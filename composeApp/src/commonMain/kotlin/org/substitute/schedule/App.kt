@@ -1,6 +1,7 @@
 package org.substitute.schedule
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -33,55 +34,50 @@ import androidx.navigation.toRoute
 import com.multiplatform.webview.web.LoadingState
 import com.multiplatform.webview.web.WebView
 import com.multiplatform.webview.web.rememberWebViewState
+import kotlinx.coroutines.CoroutineScope
 import org.substitute.schedule.networking.DsbApiClient
 import org.substitute.schedule.networking.TimeTable
+import org.substitute.schedule.ui.screens.LoadingTimeTables
+import org.substitute.schedule.ui.screens.SettingsScreen
 import org.substitute.schedule.ui.screens.WebViewScreen
 import org.substitute.schedule.ui.theme.AppTheme
+import org.substitute.schedule.utils.Constants.PASSWORD
+import org.substitute.schedule.utils.Constants.USERNAME
 import org.substitute.schedule.utils.Destination
+import org.substitute.schedule.utils.SecureStorage
 import org.substitute.schedule.utils.enums.SelectedScreen
 
 @Composable
 fun App(
-    client: DsbApiClient
+    client: DsbApiClient,
+    storage: SecureStorage
 ) {
     AppTheme() {
         var selectedScreen by remember { mutableStateOf(SelectedScreen.TODAY) }
         var distinctTables by remember { mutableStateOf<List<TimeTable>>(emptyList()) }
         var isLoading by remember { mutableStateOf(true) }
+        var loadAttemptFailed by remember { mutableStateOf(false) }
+
 
         LaunchedEffect(Unit) {
+            client.username = storage.getString(USERNAME).toString()
+            client.password = storage.getString(PASSWORD).toString()
+
+            println("App(): Username: ${client.username}")
+            println("App(): Password: ${client.password}")
+
             try {
                 val tables = client.getTimeTables()
                 distinctTables = tables.distinctBy { it.uuid }
-                println("Distinct Tables: $distinctTables")
                 isLoading = false
+                loadAttemptFailed = false
             } catch (e: Exception) {
-                println("Error loading timetables: ${e.message}")
+                println("App(): Error loading timetables: ${e.message}")
                 isLoading = false
+                loadAttemptFailed = true
             }
         }
 
-        // Show loading state until data is ready
-        if (isLoading) {
-            Box(
-                modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
-                contentAlignment = Alignment.Center,
-
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    CircularProgressIndicator()
-                    Text("Loading timetables...", color = MaterialTheme.colorScheme.onBackground)
-                }
-            }
-            return@AppTheme
-        }
-
-
-        val startDestination = if (distinctTables.isNotEmpty()) {
-            Destination.Today(distinctTables[0].detail)
-        } else {
-            Destination.Settings(true)
-        }
 
         val navController = rememberNavController()
 
@@ -91,7 +87,7 @@ fun App(
                     NavigationBarItem(
                         selected = selectedScreen == SelectedScreen.TODAY,
                         onClick = {
-                            if (distinctTables.size > 1 && startDestination != Destination.Settings) {
+                            if (distinctTables.size > 1 && navController.currentDestination != Destination.Settings) {
                                 navController.navigate(Destination.Today(distinctTables[0].detail))
                                 selectedScreen = SelectedScreen.TODAY
                             }
@@ -107,7 +103,7 @@ fun App(
                     NavigationBarItem(
                         selected = selectedScreen == SelectedScreen.TOMORROW,
                         onClick = {
-                            if (distinctTables.size > 1 && startDestination != Destination.Settings) {
+                            if (distinctTables.size > 1 && navController.currentDestination != Destination.Settings) {
                                 navController.navigate(Destination.Tomorrow(distinctTables[1].detail))
                                 selectedScreen = SelectedScreen.TOMORROW
                             }
@@ -139,8 +135,29 @@ fun App(
 
             NavHost(
                 navController,
-                startDestination = startDestination
+                startDestination = Destination.InitialLoadingRoute
             ) {
+                composable<Destination.InitialLoadingRoute> {
+
+                    LaunchedEffect(isLoading) {
+
+                        if (!isLoading) {
+
+                            if (client.username.isNotEmpty() && !loadAttemptFailed) {
+                                val url = distinctTables.first().detail
+
+                                // Use popBackStack/replace to prevent the loading route from being on the back stack
+                                navController.popBackStack()
+                                navController.navigate(Destination.Today(url))
+                            } else {
+                                navController.popBackStack()
+                                navController.navigate(Destination.Settings(true))
+                            }
+                        }
+                    }
+
+                    LoadingTimeTables()
+                }
 
                 composable<Destination.Today> {
                     selectedScreen = SelectedScreen.TODAY
@@ -163,19 +180,18 @@ fun App(
 
                     box()
 
-
-
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        if (args.noCredentials) {
-                            Text("No credentials found", color = MaterialTheme.colorScheme.error, fontSize = 20.sp)
-                            Spacer(Modifier.height(16.dp))
-                        } else {
-                            Text("Settings screen")
-                        }
-                    }
+//                    Column {
+//                        Spacer(Modifier.height(32.dp))
+//
+//                        if (args.noCredentials) {
+//                            Text("No credentials found", color = MaterialTheme.colorScheme.error, fontSize = 20.sp,
+//                                modifier = Modifier.align(Alignment.CenterHorizontally))
+//                            Spacer(Modifier.height(16.dp))
+//                        } else {
+//                            Text("Settings screen")
+//                        }
+//                    }
+                    SettingsScreen(storage)
                 }
             }
         }

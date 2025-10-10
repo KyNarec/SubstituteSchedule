@@ -55,20 +55,25 @@ kotlin {
             api("io.github.kevinnzou:compose-webview-multiplatform:2.0.3")
             implementation("dev.datlag:kcef:2025.03.23")
             implementation(libs.bundles.ktor)
-            implementation("org.slf4j:slf4j-api:2.0.17")
-            implementation("com.squareup.okio:okio:3.16.0")
+            implementation(libs.slf4j.api)
+            implementation(libs.okio)
             // JSON serialization (replaces Gson)
-            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
+            implementation(libs.kotlinx.serialization.json)
 
             // Date/Time (replaces SimpleDateFormat/Date)
-            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
 
             // UUID (replaces java.util.UUID)
-            implementation("com.benasher44:uuid:0.8.2")
+            implementation(libs.uuid)
 
             implementation(libs.navigation.compose)
 //            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
-            implementation("org.jetbrains.compose.material:material-icons-extended:1.7.3")
+            implementation(libs.material.icons.extended)
+
+            implementation("eu.anifantakis:ksafe:1.1.1")
+            implementation("eu.anifantakis:ksafe-compose:1.1.1") // ← Compose state (optional)
+
+            implementation("androidx.security:security-crypto-ktx:1.1.0")
 
 
         }

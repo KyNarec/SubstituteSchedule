@@ -8,7 +8,6 @@ import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.util.network.*
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -20,6 +19,7 @@ import org.substitute.schedule.networking.util.Result
 import org.substitute.schedule.networking.util.onSuccess
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
+import kotlin.time.ExperimentalTime
 
 data class TimeTable(
     val uuid: Uuid,
@@ -30,26 +30,55 @@ data class TimeTable(
 )
 
 class DsbApiClient(
-    private val httpClient: HttpClient
+    private val httpClient: HttpClient,
 ) {
+    companion object {
+        const val USERID = "UserId"
+        const val USERPW = "UserPw"
+        const val LANGUAGE = "Language"
+        const val DEVICE = "Device"
+        const val APPID = "AppId"
+        const val APPVERSION = "AppVersion"
+        const val OSVERSION = "OsVersion"
+        const val PUSHID = "PushId"
+        const val BUNDLEID = "BundleId"
+    }
     private val json = Json { ignoreUnknownKeys = true }
     private val args = mutableMapOf<String, Any?>()
 
+    var username: String = ""
+        set(newUsername) {
+            field = newUsername
+            args[USERID] = newUsername
+
+        }
+
+    var password: String = ""
+        set(newPassword) {
+            field = newPassword
+            args[USERPW] = newPassword
+        }
+
+
     init {
-        args["UserId"] = "XX"
-        args["UserPw"] = "XX"
-        args["Language"] = "de"
+//        args["UserId"] = username
+//        args["UserPw"] = password
+        args[LANGUAGE] = "de"
 
-        args["Device"] = "Nexus 4"
-        args["AppId"] = uuid4().toString()
-        args["AppVersion"] = "2.5.9"
-        args["OsVersion"] = "27 8.1.0"
+        args[DEVICE] = "Nexus 4"
+        args[APPID] = uuid4().toString()
+        args[APPVERSION] = "2.5.9"
+        args[OSVERSION] = "27 8.1.0"
 
-        args["PushId"] = ""
-        args["BundleId"] = "de.heinekingmedia.dsbmobile"
+        args[PUSHID] = ""
+        args[BUNDLEID] = "de.heinekingmedia.dsbmobile"
     }
 
     suspend fun pullData(): Result<Any?, NetworkError> {
+        if (username.isEmpty()) throw IllegalStateException("Username is empty (not set via storage)")
+        if (password.isEmpty()) throw IllegalStateException("Password is empty (not set via storage)")
+        if (args[USERID] == "") throw IllegalStateException("Username is ${args[USERID]}")
+        if (args[USERPW] == "") throw IllegalStateException("Password is: ${args[USERPW]}")
         val response = try {
             httpClient.post {
                 url("https://www.dsbmobile.de/JsonHandler.ashx/GetData")
@@ -125,10 +154,10 @@ class DsbApiClient(
         return timeTables
     }
 
-    @OptIn(ExperimentalEncodingApi::class)
+    @OptIn(ExperimentalEncodingApi::class, ExperimentalTime::class)
     @Throws(IOException::class)
     private fun packageArgs(): String {
-        val date = getFormattedTime(Clock.System.now())
+        val date = getFormattedTime(kotlin.time.Clock.System.now())
         args["Date"] = date
         args["LastUpdate"] = date
 
@@ -170,6 +199,7 @@ class DsbApiClient(
         return resultJson
     }
 
+    @OptIn(ExperimentalTime::class)
     private fun getFormattedTime(instant: Instant): String {
         val dateTime = instant.toLocalDateTime(TimeZone.UTC)
 
