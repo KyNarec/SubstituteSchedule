@@ -8,6 +8,7 @@ import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.util.network.*
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -157,7 +158,7 @@ class DsbApiClient(
     @OptIn(ExperimentalEncodingApi::class, ExperimentalTime::class)
     @Throws(IOException::class)
     private fun packageArgs(): String {
-        val date = getFormattedTime(kotlin.time.Clock.System.now())
+        val date = getFormattedTime(Clock.System.now())
         args["Date"] = date
         args["LastUpdate"] = date
 
