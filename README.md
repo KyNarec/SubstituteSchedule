@@ -1,48 +1,104 @@
-This is a Kotlin Multiplatform project targeting Android, iOS, Desktop (JVM).
+# Substitute Schedule App
 
-* [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - [commonMain](./composeApp/src/commonMain/kotlin) is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    the [iosMain](./composeApp/src/iosMain/kotlin) folder would be the right place for such calls.
-    Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./composeApp/src/jvmMain/kotlin)
-    folder is the appropriate location.
+A Kotlin Multiplatform application for viewing substitute schedules from DSBmobile, supporting Android, iOS, and Desktop (JVM) platforms.
 
-* [/iosApp](./iosApp/iosApp) contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform,
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+## Features
 
-### Build and Run Android Application
+- **Cross-platform**: Runs on Android, iOS, and Desktop (Windows, macOS, Linux)
+- **DSBmobile Integration**: Fetches and displays substitute schedules from DSBmobile API
+- **Modern UI**: Built with Jetpack Compose Multiplatform and Material 3 design
+- **WebView Display**: Renders schedule content in an embedded web view
+- **Navigation**: Easy switching between today's and tomorrow's schedules
+- **Dark/Light Theme**: Automatic theme support based on system preferences
 
-To build and run the development version of the Android app, use the run configuration from the run widget
-in your IDE’s toolbar or build it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:assembleDebug
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:assembleDebug
-  ```
+## Installation
+Download the installer for your System from the [Releases Tab](https://github.com/KyNarec/SubstituteSchedule/releases)
+* .apk file for Android
+* .msi file for Windows
+* .deb file for Linux
 
-### Build and Run Desktop (JVM) Application
+and execute it.
 
-To build and run the development version of the desktop app, use the run configuration from the run widget
-in your IDE’s toolbar or run it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:run
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:run
-  ```
 
-### Build and Run iOS Application
+## Tech Stack
 
-To build and run the development version of the iOS app, use the run configuration from the run widget
-in your IDE’s toolbar or open the [/iosApp](./iosApp) directory in Xcode and run it from there.
+### Core
+- **Kotlin Multiplatform** - Code sharing across platforms
+- **Jetpack Compose Multiplatform** - Modern declarative UI framework
+- **Material 3** - Google's latest design system
 
----
+### Networking
+- **Ktor Client** - HTTP client for API communication
+- Platform-specific engines: OkHttp (Android/JVM), Darwin (iOS)
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+### Data Handling
+- **kotlinx-serialization** - JSON serialization/deserialization
+- **kotlinx-datetime** - Cross-platform date/time handling
+- **Okio** - Efficient I/O operations and compression
+- **UUID** - Cross-platform UUID generation
+
+### UI Components
+- **compose-webview-multiplatform** - WebView support across platforms
+- **KCEF** (Desktop only) - Chromium Embedded Framework for JVM
+- **Material Icons Extended** - Comprehensive icon set
+
+### Navigation
+- **Navigation Compose** - Type-safe navigation with Kotlin serialization
+
+## Platform Support
+
+### Android
+- Minimum SDK: 24
+- Target SDK: 35
+- Uses OkHttp engine for networking
+
+### iOS
+- Supports ARM64 devices and Simulator
+- Uses Darwin engine for networking
+- Framework-based distribution
+
+### Desktop (JVM)
+- Requires Java 11+
+- Distributable formats: DMG (macOS), MSI (Windows), DEB (Linux)
+- Uses KCEF for enhanced WebView support
+
+## Setup for development
+
+### Prerequisites
+- JDK 11 or higher
+- Android Studio (for Android development)
+- Xcode (for iOS development)
+- Kotlin 2.0+
+
+### Building
+
+#### Android
+```bash
+./gradlew :composeApp:assembleDebug
+```
+
+#### iOS
+```bash
+./gradlew :composeApp:iosSimulatorArm64MainKlibrary
+```
+Then open the project in Xcode to run on simulator or device.
+
+#### Desktop
+```bash
+./gradlew :composeApp:run
+```
+
+### Creating Distribution Packages
+
+#### Desktop
+```bash
+./gradlew :composeApp:packageDistributionForCurrentOS
+```
+
+
+## Acknowledgments
+
+- Built with [Jetpack Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/)
+- Uses [compose-webview-multiplatform](https://github.com/kevinnzou/compose-webview-multiplatform)
+- Backend inspired by [DSBmobile-API](https://github.com/Sematre/DSBmobile-API)
+- Desktop WebView powered by [KCEF](https://github.com/DatL4g/KCEF)
