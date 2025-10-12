@@ -106,6 +106,8 @@ kotlin {
     }
 }
 
+val appVersion = "1.0.0"
+
 android {
     namespace = "org.substitute.schedule"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
@@ -115,7 +117,7 @@ android {
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
-        versionName = "1.0"
+        versionName = appVersion
     }
     packaging {
         resources {
@@ -144,7 +146,20 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "org.substitute.schedule"
-            packageVersion = "1.0.0"
+            packageVersion = appVersion
         }
     }
 }
+
+// Task to generate version.properties (runs during configuration)
+val generateVersionProperties = tasks.register("generateVersionProperties") {
+    doLast {
+        val resourcesDir = file("src/jvmMain/resources")
+        resourcesDir.mkdirs()
+        val versionFile = file("$resourcesDir/version.properties")
+        versionFile.writeText("version=$appVersion")
+    }
+}
+
+// Run it automatically
+generateVersionProperties.get().actions.forEach { it.execute(generateVersionProperties.get()) }

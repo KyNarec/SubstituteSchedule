@@ -39,10 +39,13 @@ import com.multiplatform.webview.web.rememberWebViewState
 import kotlinx.coroutines.CoroutineScope
 import org.substitute.schedule.networking.DsbApiClient
 import org.substitute.schedule.networking.TimeTable
+import org.substitute.schedule.ui.UpdateDialog
 import org.substitute.schedule.ui.screens.LoadingTimeTables
 import org.substitute.schedule.ui.screens.SettingsScreen
 import org.substitute.schedule.ui.screens.WebViewScreen
 import org.substitute.schedule.ui.theme.AppTheme
+import org.substitute.schedule.update.PlatformUpdateManager
+import org.substitute.schedule.update.UpdateViewModel
 import org.substitute.schedule.utils.Constants.PASSWORD
 import org.substitute.schedule.utils.Constants.USERNAME
 import org.substitute.schedule.utils.Destination
@@ -60,9 +63,13 @@ fun App(
         var isLoading by remember { mutableStateOf(true) }
         var loadAttemptFailed by remember { mutableStateOf(false) }
         val snackbarHostState = remember { SnackbarHostState() }
+        val updateManager = remember { PlatformUpdateManager() }
+        val viewModel = remember { UpdateViewModel(updateManager) }
         val scope = rememberCoroutineScope()
 
         LaunchedEffect(Unit) {
+            viewModel.checkForUpdates()
+
             client.username = storage.getString(USERNAME).toString()
             client.password = storage.getString(PASSWORD).toString()
 
@@ -145,24 +152,36 @@ fun App(
             ) {
                 composable<Destination.InitialLoadingRoute> {
 
-                    LaunchedEffect(isLoading) {
+                    if (viewModel.showDialog && viewModel.updateInfo != null) {
+                        UpdateDialog(
+                            updateInfo = viewModel.updateInfo!!,
+                            downloadStatus = viewModel.downloadStatus,
+                            supportsInAppInstallation = updateManager.supportsInAppInstallation(),
+                            onDismiss = { viewModel.dismissDialog() },
+                            onUpdate = { viewModel.startDownload() },
+                            onOpenStore = { viewModel.openStore() }
+                        )
+                    } else {
 
-                        if (!isLoading) {
+                        LaunchedEffect(isLoading) {
 
-                            if (client.username.isNotEmpty() && !loadAttemptFailed) {
-                                val url = distinctTables.first().detail
+                            if (!isLoading) {
 
-                                // Use popBackStack/replace to prevent the loading route from being on the back stack
-                                navController.popBackStack()
-                                navController.navigate(Destination.Today(url))
-                            } else {
-                                navController.popBackStack()
-                                navController.navigate(Destination.Settings(true))
+                                if (client.username.isNotEmpty() && !loadAttemptFailed) {
+                                    val url = distinctTables.first().detail
+
+                                    // Use popBackStack/replace to prevent the loading route from being on the back stack
+                                    navController.popBackStack()
+                                    navController.navigate(Destination.Today(url))
+                                } else {
+                                    navController.popBackStack()
+                                    navController.navigate(Destination.Settings(true))
+                                }
                             }
                         }
-                    }
 
-                    LoadingTimeTables()
+                        LoadingTimeTables()
+                    }
                 }
 
                 composable<Destination.Today> {

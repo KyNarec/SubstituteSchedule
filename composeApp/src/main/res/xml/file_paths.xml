@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- External files directory for storing downloaded APKs -->
+    <external-files-path
+        name="updates"
+        path="updates/" />
+
+    <!-- Alternative: External cache directory -->
+<!--    <external-cache-path-->
+<!--        name="apk_cache"-->
+<!--        path="." />-->
+
+<!--    &lt;!&ndash; If you want to use the standard external files directory &ndash;&gt;-->
+<!--    <external-files-path-->
+<!--        name="external_files"-->
+<!--        path="." />-->
+</paths>

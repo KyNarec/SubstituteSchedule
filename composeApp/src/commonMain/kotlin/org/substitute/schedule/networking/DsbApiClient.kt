@@ -158,7 +158,7 @@ class DsbApiClient(
     @OptIn(ExperimentalEncodingApi::class, ExperimentalTime::class)
     @Throws(IOException::class)
     private fun packageArgs(): String {
-        val date = getFormattedTime(Clock.System.now())
+        val date = getFormattedTime(kotlin.time.Clock.System.now())
         args["Date"] = date
         args["LastUpdate"] = date
 

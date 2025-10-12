@@ -11,12 +11,14 @@ import io.ktor.client.engine.okhttp.OkHttp
 import okhttp3.internal.platform.PlatformRegistry.applicationContext
 import org.substitute.schedule.networking.DsbApiClient
 import org.substitute.schedule.networking.createHttpClient
+import org.substitute.schedule.update.PlatformContext
 import org.substitute.schedule.utils.AndroidSecureStorage
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        PlatformContext.initialize(applicationContext)
 
         setContent {
             App(
