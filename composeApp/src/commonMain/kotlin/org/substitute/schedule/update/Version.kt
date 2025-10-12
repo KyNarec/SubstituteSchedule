@@ -1,10 +1,7 @@
 package org.substitute.schedule.update
 
 data class Version(
-    val major: Int,
-    val minor: Int,
-    val patch: Int,
-    val preRelease: String? = null
+    val major: Int, val minor: Int, val patch: Int, val preRelease: String? = null
 ) : Comparable<Version> {
 
     override fun compareTo(other: Version): Int {
@@ -28,15 +25,19 @@ data class Version(
 
     companion object {
         fun parse(versionString: String): Version? {
-            val regex = """(\d+)\.(\d+)\.(\d+)(?:-(.+))?""".toRegex()
-            val match = regex.matchEntire(versionString) ?: return null
+            // Clean up the version string: remove 'v' prefix, trim whitespace, remove leading dots
+            val cleaned = versionString.trim().removePrefix("v").removePrefix("V").trimStart('.')
+
+            // Support both X.Y.Z and X.Y formats (patch defaults to 0)
+            val regex = """(\d+)\.(\d+)(?:\.(\d+))?(?:-(.+))?""".toRegex()
+            val match = regex.matchEntire(cleaned) ?: return null
 
             return Version(
                 major = match.groupValues[1].toInt(),
                 minor = match.groupValues[2].toInt(),
-                patch = match.groupValues[3].toInt(),
-                preRelease = match.groupValues.getOrNull(4)?.takeIf { it.isNotEmpty() }
-            )
+                patch = match.groupValues.getOrNull(3)?.toIntOrNull() ?: 0,
+                preRelease = match.groupValues.getOrNull(4)?.takeIf { it.isNotEmpty() })
         }
     }
 }
+
