@@ -93,6 +93,7 @@ class DsbApiClient(
         } catch (e: UnresolvedAddressException) {
             return Result.Error(NetworkError.NO_INTERNET)
         } catch (e: Exception) {
+            println("Error in pullData: ${e.message}")
             return Result.Error(NetworkError.SERIALIZATION)
         }
 
