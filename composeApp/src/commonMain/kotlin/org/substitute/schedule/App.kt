@@ -62,6 +62,7 @@ import org.substitute.schedule.utils.enums.SelectedScreen
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import org.substitute.schedule.ui.screens.settings.DYNAMICCOLORS
 
 object SecureStorageEvents {
     private val _booleanUpdates = MutableSharedFlow<Pair<String, Boolean>>(replay = 1)
@@ -77,7 +78,11 @@ fun App(
     client: DsbApiClient,
     storage: SecureStorage
 ) {
-    AppTheme() {
+    val dynamicColors by storage.observeBoolean(DYNAMICCOLORS)
+        .collectAsState(initial = storage.getBoolean(DYNAMICCOLORS))
+    AppTheme(
+        dynamicColor = dynamicColors
+    ) {
         var selectedScreen by remember { mutableStateOf(SelectedScreen.TODAY) }
         var distinctTables by remember { mutableStateOf<List<TimeTable>>(emptyList()) }
         var isLoading by remember { mutableStateOf(true) }
