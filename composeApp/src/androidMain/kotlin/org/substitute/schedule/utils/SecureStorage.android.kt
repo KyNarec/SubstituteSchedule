@@ -5,6 +5,8 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlin.reflect.KClass
+import kotlin.reflect.cast
 
 class AndroidSecureStorage(context: Context) : SecureStorage {
     private val prefs = EncryptedSharedPreferences.create(
@@ -51,6 +53,25 @@ class AndroidSecureStorage(context: Context) : SecureStorage {
 
         SecureStorageEvents.stringUpdates.collect { (k, v) ->
             if (k == key) emit(v)
+        }
+    }
+
+    override fun <T : Enum<T>> putEnum(key: String, value: T) {
+        prefs.edit().putString(key, value.name).apply()
+        SecureStorageEvents.emitEnumUpdate(key, value)
+    }
+
+    override fun <T : Enum<T>> getEnum(key: String, enumClass: KClass<T>): T? {
+        val name = prefs.getString(key, null)
+        return name?.let {
+            runCatching { java.lang.Enum.valueOf(enumClass.java, it) }.getOrNull()
+        }
+    }
+
+    override fun <T : Enum<T>> observeEnum(key: String, enumClass: KClass<T>): Flow<T?> = flow {
+        emit(getEnum(key, enumClass))
+        SecureStorageEvents.enumUpdates.collect { (k, v) ->
+            if (k == key && enumClass.isInstance(v)) emit(enumClass.cast(v))
         }
     }
 }
