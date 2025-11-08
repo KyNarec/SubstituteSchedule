@@ -15,10 +15,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.substitute.schedule.utils.Constants.DYNAMICCOLORS
+import org.substitute.schedule.utils.Constants.NAVBARTEXT
 import org.substitute.schedule.utils.SecureStorage
 
-const val NAVBARTEXT = "navigation_bar_text"
-const val DYNAMICCOLORS = "dynamic_colors"
+
 
 @Composable
 fun UiSettings(

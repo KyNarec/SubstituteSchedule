@@ -1,25 +1,13 @@
 package org.substitute.schedule
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Today
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -27,19 +15,12 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.multiplatform.webview.web.LoadingState
-import com.multiplatform.webview.web.WebView
-import com.multiplatform.webview.web.rememberWebViewState
-import kotlinx.coroutines.CoroutineScope
 import org.substitute.schedule.networking.DsbApiClient
 import org.substitute.schedule.networking.TimeTable
 import org.substitute.schedule.ui.UpdateDialog
@@ -47,7 +28,6 @@ import org.substitute.schedule.ui.screens.LoadingTimeTables
 import org.substitute.schedule.ui.screens.settings.SettingsScreen
 import org.substitute.schedule.ui.screens.WebViewScreen
 import org.substitute.schedule.ui.screens.settings.AccountSettings
-import org.substitute.schedule.ui.screens.settings.NAVBARTEXT
 import org.substitute.schedule.ui.screens.settings.UiSettings
 import org.substitute.schedule.ui.theme.AppTheme
 import org.substitute.schedule.update.PlatformUpdateManager
@@ -57,21 +37,9 @@ import org.substitute.schedule.utils.Constants.USERNAME
 import org.substitute.schedule.utils.Destination
 import org.substitute.schedule.utils.SecureStorage
 import org.substitute.schedule.utils.enums.SelectedScreen
+import org.substitute.schedule.utils.Constants.DYNAMICCOLORS
+import org.substitute.schedule.utils.Constants.NAVBARTEXT
 
-
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import org.substitute.schedule.ui.screens.settings.DYNAMICCOLORS
-
-object SecureStorageEvents {
-    private val _booleanUpdates = MutableSharedFlow<Pair<String, Boolean>>(replay = 1)
-    val booleanUpdates: SharedFlow<Pair<String, Boolean>> = _booleanUpdates.asSharedFlow()
-
-    fun emitBooleanUpdate(key: String, value: Boolean) {
-        _booleanUpdates.tryEmit(key to value)
-    }
-}
 
 @Composable
 fun App(
