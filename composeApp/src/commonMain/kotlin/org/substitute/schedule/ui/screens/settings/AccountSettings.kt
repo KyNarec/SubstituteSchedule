@@ -1,6 +1,5 @@
 package org.substitute.schedule.ui.screens.settings
 
-import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -25,6 +25,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.ContentType
+import androidx.compose.ui.semantics.contentType
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -90,7 +95,15 @@ fun AccountSettings(
                 onValueChange = { username = it },
                 label = { Text("Username") },
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth().padding(16.dp,16.dp,16.dp,8.dp)
+                keyboardOptions = KeyboardOptions(
+                    autoCorrectEnabled = false,
+                    keyboardType = KeyboardType.Text,  // Can be email in the future
+                    imeAction = ImeAction.Next,
+                ),
+                modifier = Modifier.fillMaxWidth()
+                    .padding(16.dp, 16.dp, 16.dp, 8.dp)
+                    .semantics { contentType = ContentType.Username }
+
             )
 
 
@@ -100,7 +113,15 @@ fun AccountSettings(
                 label = { Text("Password") },
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth().padding(16.dp,8.dp,16.dp,8.dp)
+                keyboardOptions = KeyboardOptions(
+                    autoCorrectEnabled = false,
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Done,
+                ),
+                modifier = Modifier.fillMaxWidth()
+                    .padding(16.dp, 8.dp, 16.dp, 8.dp)
+                    .semantics { contentType = ContentType.Password }
+
             )
 
             Row(
