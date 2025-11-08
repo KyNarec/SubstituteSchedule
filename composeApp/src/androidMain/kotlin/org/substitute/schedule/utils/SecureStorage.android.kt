@@ -5,7 +5,6 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import org.substitute.schedule.SecureStorageEvents
 
 class AndroidSecureStorage(context: Context) : SecureStorage {
     private val prefs = EncryptedSharedPreferences.create(
@@ -16,7 +15,12 @@ class AndroidSecureStorage(context: Context) : SecureStorage {
         EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
     )
 
-    override fun putString(key: String, value: String) = prefs.edit().putString(key, value).apply()
+    override fun putString(key: String, value: String) {
+        prefs.edit().putString(key, value).apply()
+
+        // Emit the change globally
+        SecureStorageEvents.emitStringUpdate(key, value)
+    }
 
     override fun getString(key: String): String? = prefs.getString(key, null)
 
@@ -37,6 +41,15 @@ class AndroidSecureStorage(context: Context) : SecureStorage {
 
         // Then emit updates for this specific key from the global flow
         SecureStorageEvents.booleanUpdates.collect { (k, v) ->
+            if (k == key) emit(v)
+        }
+    }
+
+    override fun observeString(key: String): Flow<String?> = flow {
+        // Emit current value first
+        emit(getString(key) ?: "")
+
+        SecureStorageEvents.stringUpdates.collect { (k, v) ->
             if (k == key) emit(v)
         }
     }

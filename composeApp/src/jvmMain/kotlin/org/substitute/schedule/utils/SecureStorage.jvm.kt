@@ -9,7 +9,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.decodeFromString
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import org.substitute.schedule.SecureStorageEvents
+import org.substitute.schedule.utils.SecureStorageEvents
 
 class DesktopSecureStorage : SecureStorage {
     private val file = File(System.getProperty("user.home"), ".securestore")
@@ -44,6 +44,9 @@ class DesktopSecureStorage : SecureStorage {
         val updatedValues = data.values.toMutableMap()
         updatedValues[keyName] = value
         writeAllData(StorageData(updatedValues))
+
+        // Emit the change globally
+        SecureStorageEvents.emitStringUpdate(keyName, value)
     }
 
     override fun getString(keyName: String): String? {
@@ -73,6 +76,16 @@ class DesktopSecureStorage : SecureStorage {
             if (k == key) emit(v)
         }
     }
+
+    override fun observeString(key: String): Flow<String> = flow {
+        // Emit current value first
+        emit(getString(key) ?: "")
+
+        SecureStorageEvents.stringUpdates.collect { (k, v) ->
+            if (k == key) emit(v)
+        }
+    }
+
 
     override fun remove(keyName: String) {
         val data = readAllData()

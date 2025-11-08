@@ -5,7 +5,7 @@ import platform.Foundation.*
 import kotlinx.cinterop.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import org.substitute.schedule.SecureStorageEvents
+import org.substitute.schedule.utils.SecureStorageEvents
 
 class IOSSecureStorage : SecureStorage {
     override fun putString(key: String, value: String) {
@@ -17,6 +17,9 @@ class IOSSecureStorage : SecureStorage {
         SecItemDelete(query)
         val addQuery = query + (kSecValueData to data)
         SecItemAdd(addQuery, null)
+
+        // Emit the change globally
+        SecureStorageEvents.emitStringUpdate(key, value)
     }
 
     override fun getString(key: String): String? {
@@ -75,6 +78,15 @@ class IOSSecureStorage : SecureStorage {
 
         // Then emit updates for this specific key from the global flow
         SecureStorageEvents.booleanUpdates.collect { (k, v) ->
+            if (k == key) emit(v)
+        }
+    }
+
+    override fun observeString(key: String): Flow<String> = flow {
+        // Emit current value first
+        emit(getString(key) ?: "")
+
+        SecureStorageEvents.stringUpdates.collect { (k, v) ->
             if (k == key) emit(v)
         }
     }

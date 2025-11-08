@@ -11,5 +11,6 @@ interface SecureStorage {
 
     fun observeBoolean(key: String): Flow<Boolean>
 
+    fun observeString(key: String): Flow<String?>
     fun remove(key: String)
 }
