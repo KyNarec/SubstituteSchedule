@@ -15,7 +15,6 @@ import androidx.compose.ui.unit.dp
 import com.multiplatform.webview.web.LoadingState
 import com.multiplatform.webview.web.WebView
 import com.multiplatform.webview.web.rememberWebViewState
-import org.substitute.schedule.box
 import org.substitute.schedule.configureWebViewZoom
 
 @Composable
@@ -25,7 +24,7 @@ fun WebViewScreen(url: String) {
     LaunchedEffect(Unit) {
         state.webSettings.apply {
             androidWebSettings.apply {
-                supportZoom = true  // This is the correct property name
+                supportZoom = true
             }
         }
     }
@@ -33,7 +32,6 @@ fun WebViewScreen(url: String) {
     val loadingState = state.loadingState
 
     Column(modifier = Modifier.fillMaxSize()) {
-        box()
         if (loadingState is LoadingState.Loading) {
             LinearProgressIndicator(
                 progress = { loadingState.progress },

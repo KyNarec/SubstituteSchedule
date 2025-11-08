@@ -12,6 +12,7 @@ import org.substitute.schedule.utils.Constants.PASSWORD
 import org.substitute.schedule.utils.Constants.USERNAME
 import org.substitute.schedule.utils.SecureStorage
 
+@Deprecated("Use settings.SettingsScreen instead")
 @Composable
 fun SettingsScreen(
     secureStorage: SecureStorage,

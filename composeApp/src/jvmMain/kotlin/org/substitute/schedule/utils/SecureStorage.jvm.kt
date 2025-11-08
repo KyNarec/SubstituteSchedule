@@ -1,9 +1,15 @@
+package org.substitute.schedule.utils
+
 import java.io.File
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import org.substitute.schedule.utils.SecureStorage
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.decodeFromString
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import org.substitute.schedule.utils.SecureStorageEvents
 
 class DesktopSecureStorage : SecureStorage {
     private val file = File(System.getProperty("user.home"), ".securestore")
@@ -38,6 +44,9 @@ class DesktopSecureStorage : SecureStorage {
         val updatedValues = data.values.toMutableMap()
         updatedValues[keyName] = value
         writeAllData(StorageData(updatedValues))
+
+        // Emit the change globally
+        SecureStorageEvents.emitStringUpdate(keyName, value)
     }
 
     override fun getString(keyName: String): String? {
@@ -49,11 +58,34 @@ class DesktopSecureStorage : SecureStorage {
         val updatedValues = data.values.toMutableMap()
         updatedValues[keyName] = value.toString()
         writeAllData(StorageData(updatedValues))
+
+        // Emit the change globally
+        SecureStorageEvents.emitBooleanUpdate(keyName, value)
     }
 
     override fun getBoolean(keyName: String): Boolean {
         return readAllData().values[keyName]?.toBoolean() ?: false
     }
+
+    override fun observeBoolean(key: String): Flow<Boolean> = flow {
+        // Emit current value first
+        emit(getBoolean(key))
+
+        // Then emit updates for this specific key from the global flow
+        SecureStorageEvents.booleanUpdates.collect { (k, v) ->
+            if (k == key) emit(v)
+        }
+    }
+
+    override fun observeString(key: String): Flow<String> = flow {
+        // Emit current value first
+        emit(getString(key) ?: "")
+
+        SecureStorageEvents.stringUpdates.collect { (k, v) ->
+            if (k == key) emit(v)
+        }
+    }
+
 
     override fun remove(keyName: String) {
         val data = readAllData()
