@@ -68,15 +68,12 @@ fun AccountSettings(
 //            horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-//            Text(
-//                "Settings",
-//                style = MaterialTheme.typography.headlineMedium,
-//                modifier = Modifier.padding(bottom = 32.dp)
-//            )
-            Spacer(Modifier.height(16.dp))
-            Box(Modifier.fillMaxWidth().padding(16.dp)) {
-                Text("Account", style = MaterialTheme.typography.headlineMedium)
-            }
+//            Spacer(Modifier.height(16.dp))
+//            Box(Modifier.fillMaxWidth().padding(16.dp)) {
+//                Text("Account", style = MaterialTheme.typography.headlineMedium)
+//            }
+            SettingsHeadlineComponent("Account")
+
             Spacer(Modifier.height(32.dp))
 
             if (noCredentials) {
@@ -101,7 +98,7 @@ fun AccountSettings(
                     imeAction = ImeAction.Next,
                 ),
                 modifier = Modifier.fillMaxWidth()
-                    .padding(16.dp, 16.dp, 16.dp, 8.dp)
+                    .padding(24.dp, 16.dp, 24.dp, 8.dp)
                     .semantics { contentType = ContentType.Username }
 
             )
@@ -119,13 +116,13 @@ fun AccountSettings(
                     imeAction = ImeAction.Done,
                 ),
                 modifier = Modifier.fillMaxWidth()
-                    .padding(16.dp, 8.dp, 16.dp, 8.dp)
+                    .padding(24.dp, 8.dp, 24.dp, 8.dp)
                     .semantics { contentType = ContentType.Password }
 
             )
 
             Row(
-                Modifier.padding(16.dp),
+                Modifier.padding(24.dp,16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Button(
@@ -161,7 +158,7 @@ fun AccountSettings(
 
             message?.let {
                 Spacer(Modifier.height(16.dp))
-                Box(Modifier.padding(16.dp).align(Alignment.CenterHorizontally)) {
+                Box(Modifier.padding(24.dp).align(Alignment.CenterHorizontally)) {
                     Text(it, style = MaterialTheme.typography.bodyMedium)
                 }
             }

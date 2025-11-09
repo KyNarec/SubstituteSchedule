@@ -10,6 +10,8 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.substitute.schedule.utils.SecureStorageEvents
+import kotlin.reflect.KClass
+import kotlin.reflect.cast
 
 class DesktopSecureStorage : SecureStorage {
     private val file = File(System.getProperty("user.home"), ".securestore")
@@ -83,6 +85,28 @@ class DesktopSecureStorage : SecureStorage {
 
         SecureStorageEvents.stringUpdates.collect { (k, v) ->
             if (k == key) emit(v)
+        }
+    }
+
+    override fun <T : Enum<T>> putEnum(keyName: String, value: T) {
+        val data = readAllData()
+        val updatedValues = data.values.toMutableMap()
+        updatedValues[keyName] = value.name
+        writeAllData(StorageData(updatedValues))
+        SecureStorageEvents.emitEnumUpdate(keyName, value)
+    }
+
+    override fun <T : Enum<T>> getEnum(keyName: String, enumClass: KClass<T>): T? {
+        val name = readAllData().values[keyName]
+        return name?.let {
+            runCatching { java.lang.Enum.valueOf(enumClass.java, it) }.getOrNull()
+        }
+    }
+
+    override fun <T : Enum<T>> observeEnum(key: String, enumClass: KClass<T>): Flow<T?> = flow {
+        emit(getEnum(key, enumClass))
+        SecureStorageEvents.enumUpdates.collect { (k, v) ->
+            if (k == key && enumClass.isInstance(v)) emit(enumClass.cast(v))
         }
     }
 
