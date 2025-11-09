@@ -64,7 +64,7 @@ fun SettingComponentSwitch(
         Box(
             modifier = Modifier
                 .align(Alignment.CenterVertically)
-                .padding(top = 8.dp, bottom = 8.dp, end = 8.dp)
+                .padding(top = 8.dp, start = 8.dp, bottom = 8.dp, end = 8.dp)
         ) {
             Switch(
                 checked = checked,
