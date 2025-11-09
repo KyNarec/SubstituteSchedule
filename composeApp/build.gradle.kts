@@ -106,7 +106,7 @@ kotlin {
     }
 }
 
-val appVersion = "2.0.2"
+val appVersion = "2.0.3"
 
 android {
     namespace = "org.substitute.schedule"
