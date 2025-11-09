@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import org.substitute.schedule.utils.Constants.DEFAULTTRANSITIONEFFECT
 import org.substitute.schedule.utils.Constants.DYNAMICCOLORS
 import org.substitute.schedule.utils.Constants.NAVBARTEXT
+import org.substitute.schedule.utils.Constants.TRANSITIONEFFECT
 import org.substitute.schedule.utils.SecureStorage
 import org.substitute.schedule.utils.enums.TransitionEffect
 
@@ -57,7 +58,7 @@ fun UiSettings(
                 title = "Screen Transition Effect",
                 description = "Choose how screens transition in the app",
                 secureStorage = secureStorage,
-                key = "transition_effect",
+                key = TRANSITIONEFFECT,
                 enumValues = TransitionEffect.all,
                 default = DEFAULTTRANSITIONEFFECT,
                 labelMapper = { it.label }

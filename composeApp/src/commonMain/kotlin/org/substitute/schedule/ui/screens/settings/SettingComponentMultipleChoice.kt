@@ -88,7 +88,7 @@ fun <T : Enum<T>> SettingComponentEnumChoice(
                                 .padding(vertical = 4.dp)
                                 .clickable {
                                     selected = value
-                                    secureStorage.putString(key, value.name)
+                                    secureStorage.putEnum(key, value)
                                     showDialog = false
                                 }
                         ) {
@@ -96,7 +96,7 @@ fun <T : Enum<T>> SettingComponentEnumChoice(
                                 selected = selected == value,
                                 onClick = {
                                     selected = value
-                                    secureStorage.putString(key, value.name)
+                                    secureStorage.putEnum(key, value)
                                     showDialog = false
                                 }
                             )

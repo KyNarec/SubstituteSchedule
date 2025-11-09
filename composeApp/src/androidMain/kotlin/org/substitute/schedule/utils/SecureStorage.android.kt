@@ -69,9 +69,17 @@ class AndroidSecureStorage(context: Context) : SecureStorage {
     }
 
     override fun <T : Enum<T>> observeEnum(key: String, enumClass: KClass<T>): Flow<T?> = flow {
-        emit(getEnum(key, enumClass))
+        val initial = getEnum(key, enumClass)
+//        println("App(): observeEnum initial for $key: $initial")
+        emit(initial)
+
         SecureStorageEvents.enumUpdates.collect { (k, v) ->
-            if (k == key && enumClass.isInstance(v)) emit(enumClass.cast(v))
+            if (k == key && enumClass.isInstance(v)) {
+                val casted = enumClass.cast(v)
+//                println("App(): observeEnum update for $key: $casted")
+                emit(casted)
+            }
         }
     }
+
 }
