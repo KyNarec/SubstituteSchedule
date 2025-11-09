@@ -75,8 +75,7 @@ kotlin {
 
             implementation("androidx.security:security-crypto-ktx:1.1.0")
 
-
-        }
+            implementation("com.mikepenz:multiplatform-markdown-renderer-m3:0.38.1")        }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
