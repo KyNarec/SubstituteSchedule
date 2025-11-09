@@ -10,10 +10,18 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import com.mikepenz.markdown.m3.Markdown
+import com.mikepenz.markdown.m3.markdownColor
+import com.mikepenz.markdown.m3.markdownTypography
 import org.substitute.schedule.update.DownloadStatus
 import org.substitute.schedule.update.UpdateInfo
+
 
 @Composable
 fun UpdateDialog(
@@ -81,17 +89,30 @@ fun UpdateDialog(
                     DownloadProgressCard(downloadStatus)
                 }
 
-                // Release notes
-                Text(
-                    text = "What's New",
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.primary
-                )
 
-                Text(
-                    text = updateInfo.releaseNotes,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                Markdown(
+                    content = updateInfo.releaseNotes,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = markdownColor(
+                        text = MaterialTheme.colorScheme.onSurface,
+                    ),
+                    typography = markdownTypography(
+                        h1 = MaterialTheme.typography.titleMedium,
+                        h2 = MaterialTheme.typography.titleMedium,
+                        h3 = MaterialTheme.typography.titleMedium,
+                        h4 = MaterialTheme.typography.titleMedium,
+                        h5 = MaterialTheme.typography.titleMedium,
+                        h6 = MaterialTheme.typography.titleMedium,
+                        text = MaterialTheme.typography.bodyMedium,
+                        paragraph = MaterialTheme.typography.bodyMedium,
+                        ordered = MaterialTheme.typography.bodyMedium,
+                        bullet = MaterialTheme.typography.bodyMedium,
+                        textLink = TextLinkStyles(
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontWeight = FontWeight.Bold, textDecoration = TextDecoration.Underline
+                            ).toSpanStyle()
+                        )
+                    )
                 )
 
                 // Platform notice
