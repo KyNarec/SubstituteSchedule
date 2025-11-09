@@ -53,11 +53,12 @@ fun SettingsScreen(
 
         Column {
 //            box()
-            Spacer(Modifier.height(16.dp))
-            Box(Modifier.fillMaxWidth().padding(16.dp)) {
-                Text("Settings", style = MaterialTheme.typography.headlineMedium)
-            }
-            Spacer(Modifier.height(32.dp))
+//            Spacer(Modifier.height(48.dp))
+//            Box(Modifier.fillMaxWidth().padding(start = 24.dp)) {
+//                Text("Settings", style = MaterialTheme.typography.headlineMedium)
+//            }
+//            Spacer(Modifier.height(24.dp))
+            SettingsHeadlineComponent("Settings")
             LazyColumn {
                 item {
                     SettingFolderComponent(

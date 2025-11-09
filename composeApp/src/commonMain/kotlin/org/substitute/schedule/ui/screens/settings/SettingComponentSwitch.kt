@@ -1,6 +1,5 @@
 package org.substitute.schedule.ui.screens.settings
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,12 +21,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import org.substitute.schedule.utils.SecureStorage
 
 @Composable
-fun SettingComponent(
+fun SettingComponentSwitch(
     icon: ImageVector,
     title: String,
     description: String,
@@ -38,22 +36,43 @@ fun SettingComponent(
     LaunchedEffect(Unit) {
         checked = secureStorage.getBoolean(switchId)
     }
-    Row(Modifier.fillMaxWidth().height(80.dp).padding(16.dp)) {
-        Box(Modifier.size(48.dp).align(Alignment.CenterVertically).padding(8.dp)) {
-            Icon(icon, contentDescription = title, Modifier.fillMaxSize())
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(80.dp)
+            .padding(16.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .align(Alignment.CenterVertically)
+                .padding(8.dp)
+        ) {
+            Icon(icon, contentDescription = title, modifier = Modifier.fillMaxSize())
         }
-//                        Spacer(Modifier.width(8.dp))
-        Column(Modifier.height(48.dp).align(Alignment.CenterVertically)) {
+
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .height(48.dp)
+                .align(Alignment.CenterVertically)
+        ) {
             Text(title, style = MaterialTheme.typography.titleMedium)
             Text(description, style = MaterialTheme.typography.bodyMedium)
         }
 
-        Box(Modifier.align(Alignment.CenterVertically).padding(top = 8.dp, bottom = 8.dp, start = 16.dp, end = 8.dp)){
-            Switch(checked = checked,
+        Box(
+            modifier = Modifier
+                .align(Alignment.CenterVertically)
+                .padding(top = 8.dp, bottom = 8.dp, end = 8.dp)
+        ) {
+            Switch(
+                checked = checked,
                 onCheckedChange = {
                     checked = it
                     secureStorage.putBoolean(switchId, it)
-                })
+                }
+            )
         }
     }
 }

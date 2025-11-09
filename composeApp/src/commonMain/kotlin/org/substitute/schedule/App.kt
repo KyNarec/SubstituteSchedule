@@ -1,5 +1,17 @@
 package org.substitute.schedule
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandIn
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.shrinkOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -15,6 +27,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.NavHost
@@ -32,6 +45,7 @@ import org.substitute.schedule.ui.screens.settings.UiSettings
 import org.substitute.schedule.ui.theme.AppTheme
 import org.substitute.schedule.update.PlatformUpdateManager
 import org.substitute.schedule.update.UpdateViewModel
+import org.substitute.schedule.utils.Constants.DEFAULTTRANSITIONEFFECT
 import org.substitute.schedule.utils.Constants.PASSWORD
 import org.substitute.schedule.utils.Constants.USERNAME
 import org.substitute.schedule.utils.Destination
@@ -39,6 +53,8 @@ import org.substitute.schedule.utils.SecureStorage
 import org.substitute.schedule.utils.enums.SelectedScreen
 import org.substitute.schedule.utils.Constants.DYNAMICCOLORS
 import org.substitute.schedule.utils.Constants.NAVBARTEXT
+import org.substitute.schedule.utils.Constants.TRANSITIONEFFECT
+import org.substitute.schedule.utils.enums.TransitionEffect
 
 
 @Composable
@@ -60,10 +76,15 @@ fun App(
         val viewModel = remember { UpdateViewModel(updateManager) }
         val navBarText by storage.observeBoolean(NAVBARTEXT)
             .collectAsState(initial = storage.getBoolean(NAVBARTEXT))
+        val defaultTransitionEffect = DEFAULTTRANSITIONEFFECT
+        val transitionEffect by storage.observeEnum(TRANSITIONEFFECT, TransitionEffect::class)
+            .collectAsState(initial = storage.getEnum(TRANSITIONEFFECT, TransitionEffect::class))
         val scope = rememberCoroutineScope()
 
         LaunchedEffect(Unit) {
             viewModel.checkForUpdates()
+
+            println("App(): LaunchedEffect: ${storage.getEnum(TRANSITIONEFFECT, TransitionEffect::class)}")
 
             client.username = storage.getString(USERNAME).toString()
             client.password = storage.getString(PASSWORD).toString()
@@ -170,7 +191,47 @@ fun App(
 
             NavHost(
                 navController,
-                startDestination = Destination.InitialLoadingRoute
+                startDestination = Destination.InitialLoadingRoute,
+                enterTransition = {
+                    when (transitionEffect?: defaultTransitionEffect) {
+                        TransitionEffect.None -> EnterTransition.None
+                        TransitionEffect.Expand -> expandIn(animationSpec = tween(350, easing = LinearOutSlowInEasing), expandFrom = Alignment.TopStart)
+                        TransitionEffect.Fade -> fadeIn(animationSpec = tween(350))
+                        TransitionEffect.Scale -> scaleIn(animationSpec = tween(350))
+                        TransitionEffect.SlideVertical -> slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Up)
+                        TransitionEffect.SlideHorizontal -> slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left)
+                   }
+                },
+                exitTransition = {
+                    when (transitionEffect?: defaultTransitionEffect) {
+                        TransitionEffect.None -> ExitTransition.None
+                        TransitionEffect.Expand -> shrinkOut(animationSpec = tween(350, easing = FastOutSlowInEasing),shrinkTowards = Alignment.TopStart)
+                        TransitionEffect.Fade -> fadeOut(animationSpec = tween(350))
+                        TransitionEffect.Scale -> scaleOut(animationSpec = tween(350))
+                        TransitionEffect.SlideVertical -> slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Down)
+                        TransitionEffect.SlideHorizontal -> slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Right)
+                    }
+                },
+                popEnterTransition = {
+                    when (transitionEffect?: defaultTransitionEffect) {
+                        TransitionEffect.None -> EnterTransition.None
+                        TransitionEffect.Expand -> expandIn(animationSpec = tween(350, easing = LinearOutSlowInEasing), expandFrom = Alignment.TopStart)
+                        TransitionEffect.Fade -> fadeIn(animationSpec = tween(350))
+                        TransitionEffect.Scale -> scaleIn(animationSpec = tween(350))
+                        TransitionEffect.SlideVertical -> slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Up)
+                        TransitionEffect.SlideHorizontal -> slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left)
+                    }
+                },
+                popExitTransition = {
+                    when (transitionEffect?: defaultTransitionEffect) {
+                        TransitionEffect.None -> ExitTransition.None
+                        TransitionEffect.Expand -> shrinkOut(animationSpec = tween(350, easing = FastOutSlowInEasing),shrinkTowards = Alignment.TopStart)
+                        TransitionEffect.Fade -> fadeOut(animationSpec = tween(350))
+                        TransitionEffect.Scale -> scaleOut(animationSpec = tween(350))
+                        TransitionEffect.SlideVertical -> slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Down)
+                        TransitionEffect.SlideHorizontal -> slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Right)
+                    }
+                }
             ) {
                 composable<Destination.InitialLoadingRoute> {
 
