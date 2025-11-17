@@ -82,4 +82,11 @@ class AndroidSecureStorage(context: Context) : SecureStorage {
         }
     }
 
+    override fun observeContains(key: String): Flow<Boolean> = flow {
+        emit(prefs.contains(key))
+        SecureStorageEvents.booleanUpdates.collect { (k, _) ->
+            if (k == key) emit(true)
+        }
+    }
+
 }

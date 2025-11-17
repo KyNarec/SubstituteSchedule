@@ -18,5 +18,6 @@ interface SecureStorage {
     fun <T : Enum<T>> getEnum(key: String, enumClass: KClass<T>): T?
     fun <T : Enum<T>> observeEnum(key: String, enumClass: KClass<T>): Flow<T?>
 
+    fun observeContains(key: String): Flow<Boolean>
     fun remove(key: String)
 }

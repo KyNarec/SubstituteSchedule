@@ -7,6 +7,7 @@ object Constants {
     const val PASSWORD = "password"
     const val NAVBARTEXT = "navigation_bar_text"
     const val DYNAMICCOLORS = "dynamic_colors"
+    const val DARKTHEME = "dark_theme"
     const val TRANSITIONEFFECT = "transition_effect"
     val DEFAULTTRANSITIONEFFECT = TransitionEffect.Expand
 }

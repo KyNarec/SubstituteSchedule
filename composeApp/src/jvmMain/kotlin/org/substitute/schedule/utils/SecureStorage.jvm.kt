@@ -110,6 +110,22 @@ class DesktopSecureStorage : SecureStorage {
         }
     }
 
+    override fun observeContains(key: String): Flow<Boolean> = flow {
+        // Emit initial state
+        emit(readAllData().values.containsKey(key))
+
+        // Any time a put occurs → contains = true
+        SecureStorageEvents.booleanUpdates.collect { (k, _) ->
+            if (k == key) emit(true)
+        }
+        SecureStorageEvents.stringUpdates.collect { (k, _) ->
+            if (k == key) emit(true)
+        }
+        SecureStorageEvents.enumUpdates.collect { (k, _) ->
+            if (k == key) emit(true)
+        }
+    }
+
 
     override fun remove(keyName: String) {
         val data = readAllData()
