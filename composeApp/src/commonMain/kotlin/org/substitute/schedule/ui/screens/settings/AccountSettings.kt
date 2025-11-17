@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -43,7 +44,7 @@ fun AccountSettings(
     secureStorage: SecureStorage,
     noCredentials: Boolean,
     snackbarHostState: SnackbarHostState,
-    ) {
+) {
     val scope = rememberCoroutineScope()
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -58,7 +59,7 @@ fun AccountSettings(
 //        println("SettingsScreen: Username: $username")
 
     }
-    Box(Modifier.fillMaxSize()){
+    Box(Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
 //                .padding(16.dp)
@@ -76,90 +77,98 @@ fun AccountSettings(
 
             Spacer(Modifier.height(32.dp))
 
-            if (noCredentials) {
-                Text(
-                    "No credentials found",
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.padding(16.dp).align(Alignment.CenterHorizontally)
+            LazyColumn {
+                item {
+                    if (noCredentials) {
+                        Text(
+                            "No credentials found",
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.headlineMedium,
+                            modifier = Modifier.padding(16.dp).align(Alignment.CenterHorizontally)
 
-                )
-                Spacer(Modifier.height(16.dp))
-            }
-
-            OutlinedTextField(
-                value = username,
-                onValueChange = { username = it },
-                label = { Text("Username") },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    autoCorrectEnabled = false,
-                    keyboardType = KeyboardType.Text,  // Can be email in the future
-                    imeAction = ImeAction.Next,
-                ),
-                modifier = Modifier.fillMaxWidth()
-                    .padding(24.dp, 16.dp, 24.dp, 8.dp)
-                    .semantics { contentType = ContentType.Username }
-
-            )
-
-
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Password") },
-                singleLine = true,
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(
-                    autoCorrectEnabled = false,
-                    keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Done,
-                ),
-                modifier = Modifier.fillMaxWidth()
-                    .padding(24.dp, 8.dp, 24.dp, 8.dp)
-                    .semantics { contentType = ContentType.Password }
-
-            )
-
-            Row(
-                Modifier.padding(24.dp,16.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Button(
-                    onClick = {
-                        scope.launch {
-                            secureStorage.putString(USERNAME, username)
-                            secureStorage.putString(PASSWORD, password)
-                            message = "Credentials saved"
-                            snackbarHostState.showSnackbar("To apply changes, please restart the app")
-                        }
-                    },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("Save")
+                        )
+                        Spacer(Modifier.height(16.dp))
+                    }
                 }
 
-                OutlinedButton(
-                    onClick = {
-                        scope.launch {
-                            secureStorage.remove(PASSWORD)
-                            secureStorage.remove(USERNAME)
-                            username = ""
-                            password = ""
-                            message = "Credentials cleared"
-                            snackbarHostState.showSnackbar("To apply changes, please restart the app")
-                        }
-                    },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("Clear")
-                }
-            }
+                item {
+                    OutlinedTextField(
+                        value = username,
+                        onValueChange = { username = it },
+                        label = { Text("Username") },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(
+                            autoCorrectEnabled = false,
+                            keyboardType = KeyboardType.Text,  // Can be email in the future
+                            imeAction = ImeAction.Next,
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(24.dp, 16.dp, 24.dp, 8.dp)
+                            .semantics { contentType = ContentType.Username }
 
-            message?.let {
-                Spacer(Modifier.height(16.dp))
-                Box(Modifier.padding(24.dp).align(Alignment.CenterHorizontally)) {
-                    Text(it, style = MaterialTheme.typography.bodyMedium)
+                    )
+
+
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        label = { Text("Password") },
+                        singleLine = true,
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(
+                            autoCorrectEnabled = false,
+                            keyboardType = KeyboardType.Password,
+                            imeAction = ImeAction.Done,
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(24.dp, 8.dp, 24.dp, 8.dp)
+                            .semantics { contentType = ContentType.Password }
+
+                    )
+                }
+
+                item {
+                    Row(
+                        Modifier.padding(24.dp, 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Button(
+                            onClick = {
+                                scope.launch {
+                                    secureStorage.putString(USERNAME, username)
+                                    secureStorage.putString(PASSWORD, password)
+                                    message = "Credentials saved"
+                                    snackbarHostState.showSnackbar("To apply changes, please restart the app")
+                                }
+                            },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text("Save")
+                        }
+
+                        OutlinedButton(
+                            onClick = {
+                                scope.launch {
+                                    secureStorage.remove(PASSWORD)
+                                    secureStorage.remove(USERNAME)
+                                    username = ""
+                                    password = ""
+                                    message = "Credentials cleared"
+                                    snackbarHostState.showSnackbar("To apply changes, please restart the app")
+                                }
+                            },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text("Clear")
+                        }
+                    }
+
+                    message?.let {
+                        Spacer(Modifier.height(16.dp))
+                        Box(Modifier.padding(24.dp).align(Alignment.CenterHorizontally)) {
+                            Text(it, style = MaterialTheme.typography.bodyMedium)
+                        }
+                    }
                 }
             }
         }
