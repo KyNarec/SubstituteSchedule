@@ -1,5 +1,6 @@
 package org.substitute.schedule.ui.screens.settings
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.substitute.schedule.utils.SecureStorage
 
@@ -31,48 +33,52 @@ fun SettingComponentSwitch(
     description: String,
     secureStorage: SecureStorage,
     switchId: String
-    ) {
+) {
     var checked by remember { mutableStateOf(true) }
     LaunchedEffect(Unit) {
         checked = secureStorage.getBoolean(switchId)
     }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(80.dp)
-            .padding(16.dp)
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(
+
+        Icon(
+            icon,
+            contentDescription = title,
             modifier = Modifier
                 .size(48.dp)
-                .align(Alignment.CenterVertically)
                 .padding(8.dp)
-        ) {
-            Icon(icon, contentDescription = title, modifier = Modifier.fillMaxSize())
-        }
+        )
 
         Column(
             modifier = Modifier
                 .weight(1f)
-                .height(48.dp)
-                .align(Alignment.CenterVertically)
+                .padding(start = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
-            Text(title, style = MaterialTheme.typography.titleMedium)
-            Text(description, style = MaterialTheme.typography.bodyMedium)
-        }
-
-        Box(
-            modifier = Modifier
-                .align(Alignment.CenterVertically)
-                .padding(top = 8.dp, start = 8.dp, bottom = 8.dp, end = 8.dp)
-        ) {
-            Switch(
-                checked = checked,
-                onCheckedChange = {
-                    checked = it
-                    secureStorage.putBoolean(switchId, it)
-                }
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = Int.MAX_VALUE,
+                overflow = TextOverflow.Visible
             )
         }
+
+        Switch(
+            checked = checked,
+            onCheckedChange = {
+                checked = it
+                secureStorage.putBoolean(switchId, it)
+            },
+            modifier = Modifier.padding(8.dp)
+        )
     }
 }
