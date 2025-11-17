@@ -12,6 +12,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkOut
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -45,6 +46,7 @@ import org.substitute.schedule.ui.screens.settings.UiSettings
 import org.substitute.schedule.ui.theme.AppTheme
 import org.substitute.schedule.update.PlatformUpdateManager
 import org.substitute.schedule.update.UpdateViewModel
+import org.substitute.schedule.utils.Constants.DARKTHEME
 import org.substitute.schedule.utils.Constants.DEFAULTTRANSITIONEFFECT
 import org.substitute.schedule.utils.Constants.PASSWORD
 import org.substitute.schedule.utils.Constants.USERNAME
@@ -64,7 +66,19 @@ fun App(
 ) {
     val dynamicColors by storage.observeBoolean(DYNAMICCOLORS)
         .collectAsState(initial = storage.getBoolean(DYNAMICCOLORS))
+    val systemDark = isSystemInDarkTheme()
+
+    val prefExists by storage.observeContains(DARKTHEME)
+        .collectAsState(initial = false)
+
+    val prefValue by storage.observeBoolean(DARKTHEME)
+        .collectAsState(initial = storage.getBoolean(DARKTHEME))
+
+    val darkTheme = if (prefExists) prefValue else systemDark
+
+
     AppTheme(
+        darkTheme = darkTheme,
         dynamicColor = dynamicColors
     ) {
         var selectedScreen by remember { mutableStateOf(SelectedScreen.TODAY) }
@@ -296,18 +310,33 @@ fun App(
 
                     val args = it.toRoute<Destination.Settings>()
 
-                    SettingsScreen(storage, snackbarHostState, args.noCredentials, navController)
+                    Box(Modifier
+                        .fillMaxSize()
+                        .padding(contentPadding))
+                    {
+                        SettingsScreen(storage, snackbarHostState, args.noCredentials, navController)
+                    }
                 }
                 composable<Destination.AccountSettings> {
                     selectedScreen = SelectedScreen.SETTINGS
 
                     val args = it.toRoute<Destination.AccountSettings>()
-                    AccountSettings(storage, args.noCredentials, snackbarHostState)
+                    Box(Modifier
+                        .fillMaxSize()
+                        .padding(contentPadding))
+                    {
+                        AccountSettings(storage, args.noCredentials, snackbarHostState)
+                    }
                 }
 
                 composable<Destination.UiSettings> {
                     selectedScreen = SelectedScreen.SETTINGS
-                    UiSettings(storage)
+                    Box(Modifier
+                        .fillMaxSize()
+                        .padding(contentPadding))
+                    {
+                        UiSettings(storage)
+                    }
                 }
             }
         }

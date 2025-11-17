@@ -132,6 +132,27 @@ class IOSSecureStorage : SecureStorage {
         }
     }
 
+    override fun observeContains(key: String): Flow<Boolean> = flow {
+        // Initial state
+        emit(
+            getString(key) != null || getBoolean(key) != false || getEnum<Any>(
+                key,
+                Any::class
+            ) != null
+        )
+
+        // Any update event means the key is present
+        SecureStorageEvents.stringUpdates.collect { (k, _) ->
+            if (k == key) emit(true)
+        }
+        SecureStorageEvents.booleanUpdates.collect { (k, _) ->
+            if (k == key) emit(true)
+        }
+        SecureStorageEvents.enumUpdates.collect { (k, _) ->
+            if (k == key) emit(true)
+        }
+    }
+
     override fun remove(key: String) {
         val query = mapOf(
             kSecClass to kSecClassGenericPassword,
