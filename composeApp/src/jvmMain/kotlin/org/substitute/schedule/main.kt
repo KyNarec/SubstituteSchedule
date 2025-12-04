@@ -1,8 +1,6 @@
 package org.substitute.schedule
 
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ComposableTargetMarker
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -17,15 +15,21 @@ import dev.datlag.kcef.KCEFBuilder
 import io.ktor.client.engine.okhttp.OkHttp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.jetbrains.compose.resources.painterResource
+import substituteschedule.composeapp.generated.resources.Res
 import org.substitute.schedule.networking.DsbApiClient
 import org.substitute.schedule.networking.createHttpClient
 import org.substitute.schedule.utils.DesktopSecureStorage
+import substituteschedule.composeapp.generated.resources.substitute_logo
 import java.io.File
-import kotlin.math.max
 
 fun main() = application {
     addTempDirectoryRemovalHook()
-    Window(onCloseRequest = ::exitApplication) {
+    Window(
+        onCloseRequest = ::exitApplication,
+        title = "Substitute Schedule",
+        icon = painterResource(Res.drawable.substitute_logo)
+    ) {
         var restartRequired by remember { mutableStateOf(false) }
         var downloading by remember { mutableStateOf(0F) }
         var initialized by remember { mutableStateOf(false) }
@@ -44,11 +48,11 @@ fun main() = application {
                             initialized = true
                         }
                     }
-                    download {
-                        github {
-                            release("jbr-release-17.0.12b1207.37")
-                        }
-                    }
+//                    download {
+//                        github {
+//                            release("jbr-release-17.0.12b1207.37")
+//                        }
+//                    }
 
                     settings {
                         cachePath = File("cache").absolutePath
@@ -76,10 +80,10 @@ fun main() = application {
             }
         }
 
-//        DisposableEffect(Unit) {
-//            onDispose {
-//                KCEF.disposeBlocking()
-//            }
-//        }
+        DisposableEffect(Unit) {
+            onDispose {
+                KCEF.disposeBlocking()
+            }
+        }
     }
 }

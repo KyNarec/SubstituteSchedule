@@ -15,7 +15,7 @@ import kotlin.reflect.cast
 
 class DesktopSecureStorage : SecureStorage {
     private val file = File(System.getProperty("user.home"), ".securestore")
-    private val key = SecretKeySpec("your-32-byte-key-goes-here!".toByteArray(), "AES")
+    private val key = SecretKeySpec("substitute-sched".toByteArray(Charsets.UTF_8), "AES")
     private val json = Json { ignoreUnknownKeys = true }
 
     @Serializable

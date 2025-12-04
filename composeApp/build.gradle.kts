@@ -70,8 +70,6 @@ kotlin {
 //            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
             implementation(libs.material.icons.extended)
 
-            implementation("org.jetbrains.compose.ui:ui-util:1.9.3")
-
             implementation("com.mikepenz:multiplatform-markdown-renderer-m3:0.38.1")
         }
         commonTest.dependencies {
@@ -81,8 +79,8 @@ kotlin {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
             implementation(libs.ktor.client.okhttp)
-            implementation("dev.datlag:kcef:2025.03.23")
-            implementation("org.jetbrains.compose.ui:ui-util:1.9.3")        }
+            implementation("dev.datlag:kcef:2024.04.20.4")
+        }
 
         nativeMain.dependencies {
             implementation(libs.ktor.client.darwin)
@@ -146,7 +144,7 @@ dependencies {
 compose.desktop {
     application {
         mainClass = "org.substitute.schedule.main"
-
+        jvmArgs("-Dawt.toolkit.name=WLToolkit")
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "org.substitute.schedule"

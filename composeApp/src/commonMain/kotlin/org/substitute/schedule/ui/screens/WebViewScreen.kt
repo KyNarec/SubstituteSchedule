@@ -43,7 +43,7 @@ fun WebViewScreen(url: String) {
             state = state,
             modifier = Modifier.fillMaxSize().padding(0.dp)
                 .background(MaterialTheme.colorScheme.background),
-//                            navigator = navigator,
+////                            navigator = navigator,
             onCreated = { webView ->
                 configureWebViewZoom(webView)
             }
