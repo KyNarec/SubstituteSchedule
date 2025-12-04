@@ -145,7 +145,7 @@ dependencies {
 
 compose.desktop {
     application {
-        mainClass = "org.substitute.schedule.MainKt"
+        mainClass = "org.substitute.schedule.main"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)

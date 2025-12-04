@@ -29,27 +29,27 @@ fun main() = application {
         var restartRequired by remember { mutableStateOf(false) }
         var downloading by remember { mutableStateOf(0F) }
         var initialized by remember { mutableStateOf(false) }
+        val bundleLocation = System.getProperty("compose.application.resources.dir")?.let { File(it) } ?: File(".")
         val download: KCEFBuilder.Download = remember { KCEFBuilder.Download.Builder().github().build() }
 
         LaunchedEffect(Unit) {
             withContext(Dispatchers.IO) {
                 KCEF.init(builder = {
-                    installDir(File("kcef-bundle"))
-
-                    /*
-                      Add this code when using JDK 17.
-                      Builder().github {
-                          release("jbr-release-17.0.10b1087.23")
-                      }.buffer(download.bufferSize).build()
-                     */
+                    installDir(File(bundleLocation, "kcef-bundle"))
                     progress {
                         onDownloading {
-                            downloading = max(it, 0F)
+                            downloading = it
                         }
                         onInitialized {
                             initialized = true
                         }
                     }
+                    download {
+                        github {
+                            release("jbr-release-17.0.12b1207.37")
+                        }
+                    }
+
                     settings {
                         cachePath = File("cache").absolutePath
                     }
@@ -64,7 +64,6 @@ fun main() = application {
         if (restartRequired) {
             Text(text = "Restart required.")
         } else {
-            initialized = true
             if (initialized) {
                 App(
                     client = DsbApiClient(createHttpClient(OkHttp.create())),
