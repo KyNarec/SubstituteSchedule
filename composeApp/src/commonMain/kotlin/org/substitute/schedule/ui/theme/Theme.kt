@@ -7,15 +7,16 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
-import android.os.Build
-import androidx.compose.ui.platform.LocalContext
+//import androidx.compose.material3.dynamicDarkColorScheme
+//import androidx.compose.material3.dynamicLightColorScheme
+//import android.os.Build
+import androidx.compose.material3.ColorScheme
+//import androidx.compose.ui.platform.LocalContext
 
 /**
  * Theme generated in figma with Material Theme Builder plugin
  */
-private val lightScheme = lightColorScheme(
+val lightScheme = lightColorScheme(
     primary = primaryLight,
     onPrimary = onPrimaryLight,
     primaryContainer = primaryContainerLight,
@@ -53,7 +54,7 @@ private val lightScheme = lightColorScheme(
     surfaceContainerHighest = surfaceContainerHighestLight,
 )
 
-private val darkScheme = darkColorScheme(
+val darkScheme = darkColorScheme(
     primary = primaryDark,
     onPrimary = onPrimaryDark,
     primaryContainer = primaryContainerDark,
@@ -254,29 +255,54 @@ val unspecified_scheme = ColorFamily(
     Color.Unspecified, Color.Unspecified, Color.Unspecified, Color.Unspecified
 )
 
+//@Composable
+//fun AppTheme(
+//    darkTheme: Boolean = isSystemInDarkTheme(),
+//    // Dynamic color is available on Android 12+
+//    dynamicColor: Boolean = false,
+//    content: @Composable() () -> Unit
+//) {
+//
+//    val colorScheme = when {
+//        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+//            val context = LocalContext.current
+//            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+//        }
+//
+//        darkTheme -> darkScheme
+//        else -> lightScheme
+//    }
+//
+//    MaterialTheme(
+//        colorScheme = colorScheme,
+//        content = content,
+//        typography = Typography(),
+//        shapes = MaterialTheme.shapes, // Pass the default shapes if you don't have custom ones
+//
+//    )
+//}
+
 @Composable
 fun AppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false,
     content: @Composable() () -> Unit
 ) {
-
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> darkScheme
-        else -> lightScheme
-    }
+    val colorScheme = getAppColorScheme(
+        darkTheme = darkTheme,
+        useDynamicColor = dynamicColor
+    )
 
     MaterialTheme(
         colorScheme = colorScheme,
-        content = content,
         typography = Typography(),
-        shapes = MaterialTheme.shapes, // Pass the default shapes if you don't have custom ones
-
+        shapes = MaterialTheme.shapes,
+        content = content
     )
 }
+
+@Composable
+expect fun getAppColorScheme(darkTheme: Boolean, useDynamicColor: Boolean): ColorScheme
+
+@Composable
+expect fun isSystemInDarkTheme(): Boolean

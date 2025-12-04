@@ -64,6 +64,7 @@ fun main() = application {
         if (restartRequired) {
             Text(text = "Restart required.")
         } else {
+            initialized = true
             if (initialized) {
                 App(
                     client = DsbApiClient(createHttpClient(OkHttp.create())),
@@ -76,10 +77,10 @@ fun main() = application {
             }
         }
 
-        DisposableEffect(Unit) {
-            onDispose {
-                KCEF.disposeBlocking()
-            }
-        }
+//        DisposableEffect(Unit) {
+//            onDispose {
+//                KCEF.disposeBlocking()
+//            }
+//        }
     }
 }

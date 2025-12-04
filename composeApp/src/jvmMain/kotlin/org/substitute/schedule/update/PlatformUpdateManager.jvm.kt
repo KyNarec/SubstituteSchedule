@@ -20,11 +20,13 @@ actual class PlatformUpdateManager : UpdateManager {
             .url("https://api.github.com/KyNarec/SubstituteSchedule/releases/latest")
             .build()
 
+        val json = Json { ignoreUnknownKeys = true }
+
         val response = client.newCall(request).execute()
-        val release = Json.decodeFromString<GitHubRelease>(response.body.string())
+        val release = json.decodeFromString<GitHubRelease>(response.body.string())
 
         val currentVersion = Version.parse(getCurrentVersion()) ?: return@withContext null
-        val latestVersion = Version.parse(release.tagName.removePrefix("v")) ?: return@withContext null
+        val latestVersion = Version.parse(release.tagName?.removePrefix("v")?: "") ?: return@withContext null
 
         if (latestVersion > currentVersion) {
             // Find appropriate installer (dmg for macOS, exe for Windows, deb/AppImage for Linux)
@@ -38,11 +40,11 @@ actual class PlatformUpdateManager : UpdateManager {
             }
 
             UpdateInfo(
-                version = release.tagName,
+                version = release.tagName?: "",
                 releaseNotes = release.body,
                 downloadUrl = asset?.browserDownloadUrl,
                 storeUrl = "https://github.com/KyNarec/SubstituteSchedule/releases/latest",
-                releaseDate = release.publishedAt
+                releaseDate = release.publishedAt?: ""
             )
         } else null
     }

@@ -41,6 +41,7 @@ kotlin {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
+            implementation("androidx.security:security-crypto-ktx:1.1.0")
 
         }
         commonMain.dependencies {
@@ -50,10 +51,10 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
+            implementation(libs.navigation.compose)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             api("io.github.kevinnzou:compose-webview-multiplatform:2.0.3")
-            implementation("dev.datlag:kcef:2025.03.23")
             implementation(libs.bundles.ktor)
             implementation(libs.slf4j.api)
             implementation(libs.okio)
@@ -66,16 +67,13 @@ kotlin {
             // UUID (replaces java.util.UUID)
             implementation(libs.uuid)
 
-            implementation(libs.navigation.compose)
 //            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
             implementation(libs.material.icons.extended)
 
-            implementation("eu.anifantakis:ksafe:1.1.1")
-            implementation("eu.anifantakis:ksafe-compose:1.1.1") // ← Compose state (optional)
+            implementation("org.jetbrains.compose.ui:ui-util:1.9.3")
 
-            implementation("androidx.security:security-crypto-ktx:1.1.0")
-
-            implementation("com.mikepenz:multiplatform-markdown-renderer-m3:0.38.1")        }
+            implementation("com.mikepenz:multiplatform-markdown-renderer-m3:0.38.1")
+        }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
@@ -83,7 +81,8 @@ kotlin {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
             implementation(libs.ktor.client.okhttp)
-        }
+            implementation("dev.datlag:kcef:2025.03.23")
+            implementation("org.jetbrains.compose.ui:ui-util:1.9.3")        }
 
         nativeMain.dependencies {
             implementation(libs.ktor.client.darwin)

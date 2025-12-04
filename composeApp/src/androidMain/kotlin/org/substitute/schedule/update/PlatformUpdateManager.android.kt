@@ -56,7 +56,7 @@ actual class PlatformUpdateManager actual constructor() : UpdateManager {
                 return@withContext null
             }
 
-            val latestVersion = Version.parse(release.tagName.removePrefix("v"))
+            val latestVersion = Version.parse(release.tagName?.removePrefix("v")?: "")
             Log.i("PlatformUpdateManager", "Latest version parsed: $latestVersion")
 
             if (latestVersion == null) {
@@ -101,11 +101,11 @@ actual class PlatformUpdateManager actual constructor() : UpdateManager {
                 }
 
                 UpdateInfo(
-                    version = release.tagName,
+                    version = release.tagName?: "",
                     releaseNotes = release.body,
                     downloadUrl = apkAsset.browserDownloadUrl,
                     storeUrl = "https://play.google.com/store/apps/details?id=${context.packageName}",
-                    releaseDate = release.publishedAt
+                    releaseDate = release.publishedAt?: ""
                 )
             } else {
                 Log.i("PlatformUpdateManager", "No update available")

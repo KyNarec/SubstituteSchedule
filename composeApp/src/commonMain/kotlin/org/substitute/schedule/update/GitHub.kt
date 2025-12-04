@@ -5,13 +5,13 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class GitHubRelease(
-    @SerialName("html_url") val htmlUrl: String,
-    @SerialName("tag_name") val tagName: String,
+    @SerialName("html_url") val htmlUrl: String? = null,
+    @SerialName("tag_name") val tagName: String? = null,
     val name: String? = null,
     val draft: Boolean = false,
     @SerialName("prerelease") val preRelease: Boolean = false,
-    @SerialName("created_at") val createdAt: String,
-    @SerialName("published_at") val publishedAt: String,
+    @SerialName("created_at") val createdAt: String? = null,
+    @SerialName("published_at") val publishedAt: String? = null,
     val assets: List<GitHubAsset> = emptyList(),
     val body: String = ""
 )
