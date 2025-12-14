@@ -33,6 +33,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import org.substitute.schedule.utils.Constants.PASSWORD
 import org.substitute.schedule.utils.Constants.USERNAME
@@ -44,6 +45,7 @@ fun AccountSettings(
     secureStorage: SecureStorage,
     noCredentials: Boolean,
     snackbarHostState: SnackbarHostState,
+    navController: NavHostController,
 ) {
     val scope = rememberCoroutineScope()
     var username by remember { mutableStateOf("") }
@@ -73,7 +75,7 @@ fun AccountSettings(
 //            Box(Modifier.fillMaxWidth().padding(16.dp)) {
 //                Text("Account", style = MaterialTheme.typography.headlineMedium)
 //            }
-            SettingsHeadlineComponent("Account")
+            SettingsHeadlineComponent("Account", navController)
 
             Spacer(Modifier.height(32.dp))
 

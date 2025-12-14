@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import org.substitute.schedule.utils.Constants.DARKTHEME
 import org.substitute.schedule.utils.Constants.DEFAULTTRANSITIONEFFECT
 import org.substitute.schedule.utils.Constants.DYNAMICCOLORS
@@ -29,7 +30,8 @@ import org.substitute.schedule.utils.enums.TransitionEffect
 
 @Composable
 fun UiSettings(
-    secureStorage: SecureStorage
+    secureStorage: SecureStorage,
+    navController: NavHostController,
 ) {
     Box(Modifier.fillMaxSize()) {
         Column {
@@ -38,7 +40,7 @@ fun UiSettings(
 //                Text("UI", style = MaterialTheme.typography.headlineMedium)
 //            }
 //            Spacer(Modifier.height(32.dp))
-            SettingsHeadlineComponent("UI")
+            SettingsHeadlineComponent("UI", navController)
 
             LazyColumn {
                 item {

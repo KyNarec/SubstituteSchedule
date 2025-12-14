@@ -325,7 +325,7 @@ fun App(
                         .fillMaxSize()
                         .padding(contentPadding))
                     {
-                        AccountSettings(storage, args.noCredentials, snackbarHostState)
+                        AccountSettings(storage, args.noCredentials, snackbarHostState, navController)
                     }
                 }
 
@@ -335,7 +335,7 @@ fun App(
                         .fillMaxSize()
                         .padding(contentPadding))
                     {
-                        UiSettings(storage)
+                        UiSettings(storage, navController)
                     }
                 }
             }

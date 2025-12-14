@@ -58,7 +58,7 @@ fun SettingsScreen(
 //                Text("Settings", style = MaterialTheme.typography.headlineMedium)
 //            }
 //            Spacer(Modifier.height(24.dp))
-            SettingsHeadlineComponent("Settings")
+            SettingsHeadlineComponent("Settings", navController)
             LazyColumn {
                 item {
                     SettingFolderComponent(
